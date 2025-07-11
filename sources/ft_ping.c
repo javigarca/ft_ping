@@ -2,17 +2,22 @@
 
 int main (int argc, char **argv)
 {
-    char *msg;
+    t_ping_options opts;
+    init_opts(&opts);
 
-    if (argc != 2){
-        msg = ft_strjoin("Using ping with a parameter, please.", "\n");
-        write(2, msg, strlen(msg));
+    if (parse_args(argc, argv, &opts)){
+        usage();
+    }
+
+    if (argc < 2){
+        usage();
+        return (EXIT_FAILURE);
     }
     else {
-        msg = ft_strjoin(argv[1], " port tested. \n");
-        write(1,msg, strlen(msg));
+        if(argv[1])
+            fprintf(stderr, "%s", argv[1]);
+        print_help();
     }
-    free(msg);
-
-    return (0);
+   
+    return (EXIT_SUCCESS);
 }
