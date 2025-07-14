@@ -13,7 +13,7 @@ Developed in C as part of the 42 school curriculum.
 - Manual construction of ICMP Echo Request packets
 - IPv4 support
 - Raw socket usage (`SOCK_RAW`)
-- Verbose mode with `-v`
+- Verbose mode with `-v` or `--verbose`
 - Help output with `-?` or `--help`
 - Statistics report on exit (`SIGINT`)
 - RTT calculation per packet
@@ -29,14 +29,14 @@ sudo ./ft_ping 8.8.8.8
 ### Option 2 :Grant raw socket capability (recommended)
 sudo setcap cap_net_raw+ep ./ft_ping
 
-Build: 
+## 🛠 Build: 
 make
  -or-
 make setcap 
   (to grant raw socket capability on build)
 
 The executable will be located at ./bin/ft_ping.
-Usage:
+## 🧪 Usage:
 ./ft_ping [options] <destination>
 
 Example:
