@@ -31,7 +31,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	@mkdir -p $(BINDIR)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p $(OBJDIR)
@@ -39,6 +39,9 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 -include $(DEPS)
 
+setcap:
+	sudo setcap cap_net_raw+ep $(TARGET)
+	
 clean:
 	rm -rf $(OBJDIR)/*.o $(OBJDIR)/*.d
 

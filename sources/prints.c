@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "ft_ping.h"
 
 /**
@@ -11,9 +12,9 @@ void    print_help(){
     printf("Usage: ft_ping [options] host\n");
     printf("Options:\n");
     printf("  -v, --verbose      verbose output\n");
-    printf("  -c <count>         stop after <count> replies\n");
-    printf("  -i <interval>      wait interval seconds between sending each packet\n");
-    printf("  -t <ttl>           set the TTL (time to live)\n");
+   // printf("  -c <count>         stop after <count> replies\n");
+   // printf("  -i <interval>      wait interval seconds between sending each packet\n");
+   // printf("  -t <ttl>           set the TTL (time to live)\n");
     printf("  -?, --help         display this help and exit\n");
 }
 
@@ -55,3 +56,48 @@ void    error_exit(int status, int errnum, const char *fmt, ...){
     fprintf(stderr, "\n");
     exit(status);
 }
+
+/**
+ * @brief Función para imprimir el resumen de las estadísticas que recibe como parámetro
+ * 
+ * @param stats estructura de las esteadisticas 
+ */
+void    print_summary(t_stats *stats){
+	double loss = 0.0;
+
+	if (stats->transmitted > 0)
+		loss = 100.0 * (stats->transmitted - stats->received) / stats->transmitted;
+
+	printf("\n--- ft_ping statistics ---\n");
+	printf("%d packets transmitted, %d received, %.0f%% packet loss\n",
+		stats->transmitted, stats->received, loss);
+
+	if (stats->received > 0) {
+		double avg = stats->rtt_total / stats->received;
+		double mdev = 0;
+		if (stats->received > 1) {
+			double mean_sq = stats->rtt_squared_total / stats->received;
+			mdev = sqrt(mean_sq - avg * avg);
+		}
+		printf("rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3f ms\n",
+			stats->rtt_min, avg, stats->rtt_max, mdev);
+	}
+}
+
+/**
+ * @brief Función para mensajes en función de verbose
+ * 
+ * @param verbose valor del flag  
+ * @param fmt Cadena de formato estilo printf para el mensaje personalizado.
+ * @param ... Argumentos variables usados junto con fmt para construir el mensaje.
+ */
+
+ void   print_infof(int verbose, FILE *stream, const char *fmt, ...){
+    if (!verbose)
+        return;
+    va_list args;
+    va_start(args, fmt);
+    vfprintf(stream, fmt,args);
+	va_end(args);
+	fprintf(stream, "\n");
+ }
