@@ -86,10 +86,7 @@ int resolve_target(t_ping_options *opts, t_target *t_out){
 	// Resolver
 	ret = getaddrinfo(opts->target, NULL, &hints, &result);
 	if (ret != 0) {
-		//printinfof(1,stderr, "ft_ping: cannot resolve %s: %s\n", opts->target, gai_strerror(ret));
-        error_exit(EXIT_FAILURE, 0, "%s: %s\n", opts->target, gai_strerror(ret));
-        //exit(EXIT_FAILURE);
-		//return -1;
+		error_exit(EXIT_FAILURE, 0, "%s: %s\n", opts->target, gai_strerror(ret));
 	}
 
 	// Extraer sockaddr_in
@@ -103,7 +100,7 @@ int resolve_target(t_ping_options *opts, t_target *t_out){
 	}
 
 	// Guardar hostname original si lo vas a usar (opcional)
-	t_out->hostname = strdup(opts->target); 
+	t_out->hostname = opts->target; 
 
 	freeaddrinfo(result);
 	return 0;

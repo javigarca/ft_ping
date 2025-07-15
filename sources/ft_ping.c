@@ -37,13 +37,12 @@ int main (int argc, char **argv)
 
     print_infof(opts.verbose, stderr, "ft_ping: sock4.fd: %d (socktype: SOCK_RAW), sock6.fd: -1 (socktype: SOCK_RAW), hints.ai_family: AF_INET.\n", socket_fd);
 
-    t_target host_target = {0};
-    if (resolve_target(&opts, &host_target))
+    if (resolve_target(&opts, &stats.target))
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");
     
     int seq = 1;
     while(1){
-        send_packet(socket_fd, &opts, &host_target, &stats, seq);
+        send_packet(socket_fd, &opts, &stats.target, &stats, seq);
        //receive_packet(socket_fd, seq, &opts, &stats);
         seq++;
         sleep(1);

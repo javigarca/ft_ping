@@ -1,8 +1,11 @@
+
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
 #include <errno.h>
 #include "ft_ping.h"
+#include "ft_ping_definitions.h"
 #include "ft_ping_structs.h"
 
 int send_packet(int sockfd, const t_ping_options *opts, const t_target *target, t_stats *stats, uint16_t seq){
@@ -10,26 +13,39 @@ int send_packet(int sockfd, const t_ping_options *opts, const t_target *target, 
 	uint64_t    now;
 	ssize_t     sent_bytes;
 
-	// 1. Rellenar cabecera
+	//  Rellenar cabecera
 	memset(&packet, 0, sizeof(packet));
 	packet.header.type = ICMP_ECHO;
 	packet.header.code = ICMP_CODE_DEFAULT;
 	packet.header.id = htons((uint16_t)getpid());
 	packet.header.sequence = htons(seq);
 
-	// 2. Timestamp en payload
+	// Timestamp en payload
 	now = ft_time_now_us();
 	memcpy(packet.payload, &now, sizeof(now));
 
-	// 3. Rellenar resto del payload
+	// Rellenar resto del payload
 	for (size_t i = sizeof(now); i < PAYLOAD_SIZE; i++)
 		packet.payload[i] = 0x42; // patrón arbitrario
 
-	// 4. Calcular checksum
+	//  Calcular checksum
 	packet.header.checksum = 0;
 	packet.header.checksum = calc_checksum(&packet, sizeof(packet));
 
-	// 5. Enviar
+    // imprimir cabecera y verboses
+    /*
+    ai->ai_family: AF_INET6, ai->ai_canonname: 'google.com'
+PING google.com (2a00:1450:4003:803::200e) 56 data bytes
+
+    */
+    const char *family_str =
+    (target->addr.sin_family == AF_INET) ? "AF_INET" :
+    (target->addr.sin_family == AF_INET6) ? "AF_INET6" :
+    "UNKNOWN";
+
+    print_infof(opts->verbose,stdout, "ai->ai_family: %s, ai->ai-canonname: '%s'", family_str, target->hostname);
+    print_infof(1, stdout, "PING %s (%s) %d data bytes", target->hostname, target->ip_str, PAYLOAD_SIZE);
+	//  Enviar
 	sent_bytes = sendto(sockfd, &packet, sizeof(packet), 0,
 	                    (struct sockaddr *)&target->addr, sizeof(target->addr));
 

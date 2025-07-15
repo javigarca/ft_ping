@@ -68,7 +68,7 @@ void    print_summary(t_stats *stats){
 	if (stats->transmitted > 0)
 		loss = 100.0 * (stats->transmitted - stats->received) / stats->transmitted;
 
-	printf("\n--- ft_ping statistics ---\n");
+	printf("\n--- %s ft_ping statistics ---\n", stats->target.hostname);
 	printf("%d packets transmitted, %d received, %.0f%% packet loss\n",
 		stats->transmitted, stats->received, loss);
 
