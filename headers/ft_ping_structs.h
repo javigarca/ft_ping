@@ -1,9 +1,11 @@
 #ifndef FT_PING_STRUCTS_H
  #define FT_PING_STRUCTS_H
 
+#include <bits/types/struct_timeval.h>
 # include <stdint.h>
 # include <netinet/in.h>   // struct sockaddr_in
 # include <arpa/inet.h>    // INET_ADDRSTRLEN
+# include <sys/time.h>
 # include "ft_ping_definitions.h"
 
  /**
@@ -57,7 +59,9 @@ typedef struct s_stats {
 	double 			rtt_total;        	// Suma acumulada de todos los RTT (para calcular la media)
 	double 			rtt_squared_total;	// Suma de los RTT^2 (para calcular la desviación estándar)
 	t_target		target;
-	t_socket_info	socket_i; 
+	t_socket_info	socket_i;
+	struct timeval	start_ping; 
+	//uint16_t		start_ping;
 } t_stats;
 
 /**
@@ -87,3 +91,69 @@ typedef struct s_packet {
 } t_packet;
 
 #endif
+
+/*
+struct iphdr {
+    #if __BYTE_ORDER == __LITTLE_ENDIAN
+        unsigned int ihl:4;
+        unsigned int version:4;
+    #elif __BYTE_ORDER == __BIG_ENDIAN
+        unsigned int version:4;
+        unsigned int ihl:4;
+    #else
+    # error "Please fix <bits/endian.h>"
+    #endif
+    uint8_t  tos;           // Type of Service
+    uint16_t tot_len;       // Total Length (header + data)
+    uint16_t id;            // Identification
+    uint16_t frag_off;      // Fragment offset and flags
+    uint8_t  ttl;           // Time to Live
+    uint8_t  protocol;      // Protocol (e.g., TCP=6, UDP=17, ICMP=1)
+    uint16_t check;         // Header checksum
+    uint32_t saddr;         // Source address
+    uint32_t daddr;         // Destination address
+    // optional options[] might follow
+};
+
+version	4 bits	Versión del protocolo (4 para IPv4).
+ihl	4 bits	Longitud del header en palabras de 32 bits (mínimo 5).
+tos	uint8_t	Type of Service (prioridad/calidad).
+tot_len	uint16_t	Longitud total del paquete (header + payload).
+id	uint16_t	ID del paquete (usado en fragmentación).
+frag_off	uint16_t	Flags y fragment offset (para reconstrucción).
+ttl	uint8_t	Time to live (cuántos routers antes de morir).
+protocol	uint8_t	Protocolo de la carga útil: TCP, UDP, ICMP, etc.
+check	uint16_t	Checksum del header.
+saddr	uint32_t	Dirección IP origen (en big endian).
+daddr	uint32_t	Dirección IP destino (también en big endian).
+
+*/
+
+/*
+struct icmphdr {
+    uint8_t  type;      // Tipo de mensaje (8=echo request, 0=echo reply)
+    uint8_t  code;      // Subtipo (normalmente 0 para echo)
+    uint16_t checksum;  // Checksum ICMP (cabecera + datos)
+
+    union {
+        struct {
+            uint16_t id;       // Identificador
+            uint16_t sequence; // Número de secuencia
+        } echo;                // Usado por echo request/reply
+
+        uint32_t gateway;      // Usado en redirect
+
+        struct {
+            uint16_t __unused;
+            uint16_t mtu;
+        } frag;                // Usado en fragmentation-needed
+    } un;
+};
+
+type	uint8_t	Tipo de mensaje ICMP.
+code	uint8_t	Código específico del tipo (más detalle).
+checksum	uint16_t	Checksum para verificar integridad.
+un.echo.id	uint16_t	Identificador para solicitudes ping.
+un.echo.sequence	uint16_t	Número de secuencia, incrementa por ping.
+
+*/

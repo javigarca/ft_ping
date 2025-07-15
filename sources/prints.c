@@ -1,7 +1,10 @@
+#include <bits/types/struct_timeval.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <sys/time.h>
+#include <time.h>
 #include "ft_ping.h"
 
 /**
@@ -64,13 +67,17 @@ void    error_exit(int status, int errnum, const char *fmt, ...){
  */
 void    print_summary(t_stats *stats){
 	double loss = 0.0;
+    struct timeval end_ping;
+    gettimeofday(&end_ping, NULL);
+    long elapsed_time = (end_ping.tv_sec - stats->start_ping.tv_sec) * 1000 + (end_ping.tv_usec - stats->start_ping.tv_usec) / 1000;
+    //uint16_t elapsed_time = stats->start_ping - ft_time_now_us();
 
 	if (stats->transmitted > 0)
 		loss = 100.0 * (stats->transmitted - stats->received) / stats->transmitted;
 
 	printf("\n--- %s ft_ping statistics ---\n", stats->target.hostname);
-	printf("%d packets transmitted, %d received, %.0f%% packet loss\n",
-		stats->transmitted, stats->received, loss);
+	printf("%d packets transmitted, %d received, %.0f%% packet loss, time %ld\n",
+		stats->transmitted, stats->received, loss, elapsed_time);
 
 	if (stats->received > 0) {
 		double avg = stats->rtt_total / stats->received;

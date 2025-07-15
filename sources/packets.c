@@ -36,7 +36,7 @@ int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t
 
 	//  Calcular checksum
 	packet.header.checksum = 0;
-	packet.header.checksum = calc_checksum(&packet, sizeof(packet));
+	packet.header.checksum = htons(calc_checksum(&packet, sizeof(packet)));
 
 	//  Enviar
 	sent_bytes = sendto(sockfd, &packet, sizeof(packet), 0, (struct sockaddr *)&stats->target.addr, sizeof(stats->target.addr));
@@ -56,48 +56,44 @@ int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t
 
 int receive_packet(int sockfd, uint16_t sent_seq, const t_ping_options *opts, t_stats *stats){
 
-    char                recv_buf[1024];
-    char                ctrl_buf[1024];
-    struct sockaddr_in  src_addr;
-    struct iovec        iov;
-    struct msghdr       msg;
+    char recv_buf[1024];
+    struct sockaddr_in src_addr;
+    socklen_t addrlen = sizeof(src_addr);
 
-    iov.iov_base = recv_buf;
-    iov.iov_len = sizeof(recv_buf);
-
-    memset(&msg, 0, sizeof(msg));
-
-    msg.msg_name = &src_addr;
-    msg.msg_namelen = sizeof(src_addr);
-    msg.msg_iov = &iov;
-    msg.msg_iovlen = 1;
-    msg.msg_control = ctrl_buf;
-    msg.msg_controllen = sizeof(ctrl_buf);
-
-    ssize_t len = recvmsg(sockfd, &msg, 0);
+    ssize_t len = recvfrom(sockfd, recv_buf, sizeof(recv_buf), 0, (struct sockaddr *)&src_addr, &addrlen);
     if (len < 0) {
-        error_exit(EXIT_FAILURE, errno, "recvmsg");
+        error_exit(EXIT_FAILURE, errno, "recvfrom");
     }
 
-    // Extraer TTL
-    int ttl = extract_ttl(&msg);
-
-    // Obtener dirección IP origen
-    char ip_str[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &src_addr.sin_addr, ip_str, sizeof(ip_str));
-
-    // Extraer cabecera IP y ICMP
+    // Extraer cabeceras IP e ICMP
     struct iphdr *ip = (struct iphdr *)recv_buf;
     struct icmphdr *icmp = (struct icmphdr *)(recv_buf + (ip->ihl * 4));
 
-    // Verificar tipo y código
-    if (icmp->type != ICMP_ECHO_REPLY || icmp->code != 0)
-        return 0;
+    //comprobación checksum
+    uint16_t received_checksum = icmp->checksum;
+    icmp->checksum = 0;
+    uint16_t icmp_len = len - (ip->ihl * 4);
+    uint16_t calculated_checksum = htons(calc_checksum(icmp, icmp_len));
+    if (received_checksum != calculated_checksum) {
+        print_infof(opts->verbose, stderr, "Invalid ICMP checksum: expected 0x%04x, got 0x%04x\n", calculated_checksum, received_checksum);
+        return (0);
+    }
+
+    // TTL directamente desde la cabecera IP
+    int ttl = ip->ttl;
+
+    // Dirección IP origen
+    char ip_str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &src_addr.sin_addr, ip_str, sizeof(ip_str));
+
+    // Verificar tipo y código ICMP
+    if (icmp->type != ICMP_ECHOREPLY || icmp->code != 0)
+        return (0);
 
     // Verificar que el paquete es nuestro
     uint16_t expected_id = (uint16_t)getpid();
     if (ntohs(icmp->un.echo.id) != expected_id || ntohs(icmp->un.echo.sequence) != sent_seq)
-        return 0;
+        return (0);
 
     // Calcular RTT
     uint64_t now = ft_time_now_us();
@@ -105,9 +101,8 @@ int receive_packet(int sockfd, uint16_t sent_seq, const t_ping_options *opts, t_
     memcpy(&sent, (void *)icmp + sizeof(struct icmphdr), sizeof(sent));
     double rtt = (now - sent) / 1000.0;
 
-    // Imprimir línea de resultado
-    printf("%ld bytes from %s: icmp_seq=%d ident=%d ttl=%d time=%.1f ms\n",
-           len, ip_str, ntohs(icmp->un.echo.sequence), ntohs(icmp->un.echo.id), ttl, rtt);
+    // Imprimir línea
+    printf("%d bytes from %s: icmp_seq=%d ident=%d ttl=%d time=%.1f ms\n", icmp_len, ip_str, ntohs(icmp->un.echo.sequence), ntohs(icmp->un.echo.id), ttl, rtt);
 
     // Actualizar estadísticas
     stats->received++;
@@ -118,7 +113,7 @@ int receive_packet(int sockfd, uint16_t sent_seq, const t_ping_options *opts, t_
     if (rtt > stats->rtt_max)
         stats->rtt_max = rtt;
 
-    return 1;   
+    return (1);
 }
 
 /**

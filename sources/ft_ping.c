@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include "ft_ping.h"
 #include "ft_ping_structs.h"
 
@@ -41,22 +42,67 @@ int main (int argc, char **argv)
     if (resolve_target(&opts, &stats.target))
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");
     get_socket_info(socket_fd, &stats);
+  
     ////impresión cabeceras
     print_infof(opts.verbose, stderr, "ft_ping: sock4.fd: %d (socktype: %s), sock6.fd: -1 (not used), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);
     print_infof(opts.verbose,stdout, "ai->ai_family: %s, ai->ai-canonname: '%s'", stats.socket_i.family_str, stats.target.hostname);
     print_infof(1, stdout, "PING %s (%s) %d data bytes", stats.target.hostname, stats.target.ip_str, PAYLOAD_SIZE);
 
     int seq = 1;
+    gettimeofday(&stats.start_ping, NULL);
+   //stats.start_ping = ft_time_now_us();
     while(1){
         send_packet(socket_fd, &opts, &stats, seq);
-       // receive_packet(socket_fd, seq, &opts, &stats);
+        //timestamp de comienzo de bucle
+        struct timeval start, now;
+        gettimeofday(&start, NULL);
+
+        int got_reply = 0;
+        while (1) {
+            // cálculo tiempo restante 
+            gettimeofday(&now, NULL);
+            double elapsed = (now.tv_sec - start.tv_sec)
+                        + (now.tv_usec - start.tv_usec)/1e6;
+            double left = 1.0 - elapsed;
+            if (left <= 0.0)
+                break;
+
+            fd_set rfds;
+            FD_ZERO(&rfds);
+            FD_SET(socket_fd, &rfds);
+            // un select con el tiempo restante    
+            struct timeval tv = {
+                .tv_sec  = (int)left,
+                .tv_usec = (int)((left - (int)left)*1e6)
+            };
+
+            int reply = select(socket_fd+1, &rfds, NULL, NULL, &tv);
+            if (reply < 0)
+                error_exit(EXIT_FAILURE, errno, "select");
+            if (reply == 0)
+                break;    // timeout
+
+            //analisis de packete
+            if (receive_packet(socket_fd, seq, &opts, &stats)) {
+                got_reply = 1;
+                break;
+            }
+            /*si no es correcto el paquete o no encontramos nada, empezamos bucle otra vez */
+        }
+
+        if (!got_reply)
+            print_infof(1, stderr, "Request timeout for icmp_seq %d\n", seq); 
         seq++;
         sleep(1);
     }
-   
     return (EXIT_SUCCESS);
 }
 
+/**
+ * @brief Función para controlar la señal SIGINT
+ * 
+ * @param signum el valor de la señal
+ */
 void    handle_sigint(int signum){
     (void)signum;
     if (g_stats_ref)
