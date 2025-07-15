@@ -44,7 +44,7 @@ int main (int argc, char **argv)
     int seq = 1;
     while(1){
         send_packet(socket_fd, &opts, &host_target, &stats, seq);
-        receive_packet(socket_fd, seq, &opts, &stats);
+       //receive_packet(socket_fd, seq, &opts, &stats);
         seq++;
         sleep(1);
     }

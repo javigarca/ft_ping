@@ -1,6 +1,0 @@
-1. parse_args()         → opciones y destino string
-2. resolve_target()     → rellena `t_target`
-3. build_packet()       → crea y rellena un `t_packet`
-4. sendto(sock, &packet, sizeof(packet), ...)
-5. recvfrom()           → analiza respuesta
-6. estadísticas → muestra resultados

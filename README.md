@@ -37,7 +37,7 @@ make setcap
 
 The executable will be located at ./bin/ft_ping.
 ## 🧪 Usage:
-./ft_ping [options] <destination>
+./ft_ping [options] <destination> 
 
 Example:
 ./ft_ping -v google.com
