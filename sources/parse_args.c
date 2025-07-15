@@ -103,5 +103,25 @@ int resolve_target(t_ping_options *opts, t_target *t_out){
 	t_out->hostname = opts->target; 
 
 	freeaddrinfo(result);
-	return 0;
+	return (0);
+}
+
+int get_socket_info(int sockfd, t_stats *stats) {
+    socklen_t optlen = sizeof(int);
+
+    // Obtener tipo real del socket
+    if (getsockopt(sockfd, SOL_SOCKET, SO_TYPE, &stats->socket_i.socktype, &optlen) < 0)
+        error_exit(EXIT_FAILURE, errno, "getsockopt SO_TYPE failed");
+
+    // Traducir tipo a string
+    stats->socket_i.socktype_str = (stats->socket_i.socktype == SOCK_RAW) ? "SOCK_RAW" :
+                        (stats->socket_i.socktype == SOCK_DGRAM) ? "SOCK_DGRAM" :
+                        (stats->socket_i.socktype == SOCK_STREAM) ? "SOCK_STREAM" : "UNKNOWN";
+
+    // Guardar familia (usada en hints o result) // de momento en mandatory con ip4 nos vale así
+    stats->socket_i.family = AF_INET;
+    stats->socket_i.family_str = (stats->socket_i.family == AF_INET) ? "AF_INET" :
+                    (stats->socket_i.family == AF_INET6) ? "AF_INET6" : "UNSPEC";
+    
+    return(0);
 }

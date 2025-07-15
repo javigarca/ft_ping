@@ -29,6 +29,18 @@ typedef struct s_target {
 } t_target;
 
 /**
+ * @brief Estructura con la info del socket para impresiones
+ * 
+ */
+typedef struct s_socket_info {
+	int fd;
+	int socktype;         // SOCK_RAW, SOCK_DGRAM, etc.
+	int family;           // AF_INET, AF_INET6...
+	char *family_str;     // "AF_INET" (dinámico o literal)
+	char *socktype_str;   // "SOCK_RAW", etc.
+} t_socket_info;
+
+/**
  * @brief Estructura para las estadísticas.
  * 
  * RTT significa Round-Trip Time: el tiempo que tarda un paquete en ir desde tu máquina al host remoto y volver con la respuesta.
@@ -38,13 +50,14 @@ typedef struct s_target {
  * mdev, desviación de latencia, cuanto menor más estable es la conexión
  */
 typedef struct s_stats {
-	int 		transmitted;         	// Nº total de paquetes enviados
-	int 		received;            	// Nº total de paquetes recibidos correctamente
-	double 		rtt_min;          	// Menor RTT observado (latencia más baja)
-	double 		rtt_max;          	// Mayor RTT observado (latencia más alta)
-	double 		rtt_total;        	// Suma acumulada de todos los RTT (para calcular la media)
-	double 		rtt_squared_total;	// Suma de los RTT^2 (para calcular la desviación estándar)
-	t_target	target;
+	int 			transmitted;         	// Nº total de paquetes enviados
+	int 			received;            	// Nº total de paquetes recibidos correctamente
+	double 			rtt_min;          	// Menor RTT observado (latencia más baja)
+	double 			rtt_max;          	// Mayor RTT observado (latencia más alta)
+	double 			rtt_total;        	// Suma acumulada de todos los RTT (para calcular la media)
+	double 			rtt_squared_total;	// Suma de los RTT^2 (para calcular la desviación estándar)
+	t_target		target;
+	t_socket_info	socket_i; 
 } t_stats;
 
 /**

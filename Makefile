@@ -39,9 +39,12 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 -include $(DEPS)
 
-setcap:
+setcap: all
 	sudo setcap cap_net_raw+ep $(TARGET)
-	
+
+setpost: 
+	sudo setcap cap_net_raw+ep $(TARGET)
+
 clean:
 	rm -rf $(OBJDIR)/*.o $(OBJDIR)/*.d
 

@@ -4,11 +4,17 @@
 #include <string.h>
 #include <sys/time.h>
 #include <errno.h>
+#include <sys/socket.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "ft_ping.h"
 #include "ft_ping_definitions.h"
 #include "ft_ping_structs.h"
 
-int send_packet(int sockfd, const t_ping_options *opts, const t_target *target, t_stats *stats, uint16_t seq){
+int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t seq){
     t_packet    packet;
 	uint64_t    now;
 	ssize_t     sent_bytes;
@@ -32,66 +38,88 @@ int send_packet(int sockfd, const t_ping_options *opts, const t_target *target, 
 	packet.header.checksum = 0;
 	packet.header.checksum = calc_checksum(&packet, sizeof(packet));
 
-    // imprimir cabecera y verboses
-    /*
-    ai->ai_family: AF_INET6, ai->ai_canonname: 'google.com'
-PING google.com (2a00:1450:4003:803::200e) 56 data bytes
-
-    */
-    const char *family_str =
-    (target->addr.sin_family == AF_INET) ? "AF_INET" :
-    (target->addr.sin_family == AF_INET6) ? "AF_INET6" :
-    "UNKNOWN";
-
-    print_infof(opts->verbose,stdout, "ai->ai_family: %s, ai->ai-canonname: '%s'", family_str, target->hostname);
-    print_infof(1, stdout, "PING %s (%s) %d data bytes", target->hostname, target->ip_str, PAYLOAD_SIZE);
 	//  Enviar
-	sent_bytes = sendto(sockfd, &packet, sizeof(packet), 0,
-	                    (struct sockaddr *)&target->addr, sizeof(target->addr));
+	sent_bytes = sendto(sockfd, &packet, sizeof(packet), 0, (struct sockaddr *)&stats->target.addr, sizeof(stats->target.addr));
 
 	if (sent_bytes < 0) {
 		print_infof(opts->verbose, stderr, "sendto failed: %s", strerror(errno));
 		return -1;
 	}
 
-	// 6. Verbose 
-	print_infof(opts->verbose, stdout, "Sent ICMP echo seq=%d (%ld bytes)",
-	            seq, sent_bytes);
+	// 6. Verbose // quitar mas tarde
+	print_infof(opts->verbose, stdout, "Sent ICMP echo seq=%d (%ld bytes)", seq, sent_bytes);
     
     stats->transmitted++;
 
-	return 0;
-
+	return (0);
 }
-/*
+
 int receive_packet(int sockfd, uint16_t sent_seq, const t_ping_options *opts, t_stats *stats){
 
-    
-    Escucha con recvfrom() (bloqueante o con timeout)
+    char                recv_buf[1024];
+    char                ctrl_buf[1024];
+    struct sockaddr_in  src_addr;
+    struct iovec        iov;
+    struct msghdr       msg;
 
-    Verifica que es un ICMP Echo Reply (type == 0)
+    iov.iov_base = recv_buf;
+    iov.iov_len = sizeof(recv_buf);
 
-    Verifica que:
+    memset(&msg, 0, sizeof(msg));
 
-        El id coincide (getpid())
+    msg.msg_name = &src_addr;
+    msg.msg_namelen = sizeof(src_addr);
+    msg.msg_iov = &iov;
+    msg.msg_iovlen = 1;
+    msg.msg_control = ctrl_buf;
+    msg.msg_controllen = sizeof(ctrl_buf);
 
-        El sequence coincide con sent_seq
+    ssize_t len = recvmsg(sockfd, &msg, 0);
+    if (len < 0) {
+        error_exit(EXIT_FAILURE, errno, "recvmsg");
+    }
 
-    Extrae el timestamp desde el payload y calcula el RTT
+    // Extraer TTL
+    int ttl = extract_ttl(&msg);
 
-    Muestra la línea como:
+    // Obtener dirección IP origen
+    char ip_str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &src_addr.sin_addr, ip_str, sizeof(ip_str));
 
-    64 bytes from 8.8.8.8: icmp_seq=3 ttl=117 time=13.7 ms
+    // Extraer cabecera IP y ICMP
+    struct iphdr *ip = (struct iphdr *)recv_buf;
+    struct icmphdr *icmp = (struct icmphdr *)(recv_buf + (ip->ihl * 4));
 
-    Actualiza las estadísticas:
+    // Verificar tipo y código
+    if (icmp->type != ICMP_ECHO_REPLY || icmp->code != 0)
+        return 0;
 
-    stats->received++
+    // Verificar que el paquete es nuestro
+    uint16_t expected_id = (uint16_t)getpid();
+    if (ntohs(icmp->un.echo.id) != expected_id || ntohs(icmp->un.echo.sequence) != sent_seq)
+        return 0;
 
-    RTT acumulado: rtt_total, rtt_min, rtt_max, etc.
-    
-    
+    // Calcular RTT
+    uint64_t now = ft_time_now_us();
+    uint64_t sent;
+    memcpy(&sent, (void *)icmp + sizeof(struct icmphdr), sizeof(sent));
+    double rtt = (now - sent) / 1000.0;
+
+    // Imprimir línea de resultado
+    printf("%ld bytes from %s: icmp_seq=%d ident=%d ttl=%d time=%.1f ms\n",
+           len, ip_str, ntohs(icmp->un.echo.sequence), ntohs(icmp->un.echo.id), ttl, rtt);
+
+    // Actualizar estadísticas
+    stats->received++;
+    stats->rtt_total += rtt;
+    stats->rtt_squared_total += rtt * rtt;
+    if (rtt < stats->rtt_min || stats->rtt_min == 0)
+        stats->rtt_min = rtt;
+    if (rtt > stats->rtt_max)
+        stats->rtt_max = rtt;
+
+    return 1;   
 }
-*/
 
 /**
  * @brief Timestamp del momento actual en microsegundos, 64bits
@@ -150,3 +178,20 @@ uint16_t calc_checksum(const void *data, size_t len)
 	// One's complement and return
 	return ~sum & 0xFFFF;
 }
+
+/**
+ * @brief Función para extraer el ttl de un buffer de control 
+ * 
+ * @param msg el buffer de control
+ * @return int el valor de ttl, si -1 es no encontrado
+ */
+int extract_ttl(struct msghdr *msg) {
+    for (struct cmsghdr *cmsg = CMSG_FIRSTHDR(msg);
+         cmsg != NULL;
+         cmsg = CMSG_NXTHDR(msg, cmsg)) {
+        if (cmsg->cmsg_level == IPPROTO_IP && cmsg->cmsg_type == IP_TTL)
+            return *(int *)CMSG_DATA(cmsg);
+    }
+    return -1; // No TTL found
+}
+
