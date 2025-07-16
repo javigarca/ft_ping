@@ -100,7 +100,7 @@ int resolve_target(t_ping_options *opts, t_target *t_out){
 	// Resolver
 	ret = getaddrinfo(opts->target, NULL, &hints, &result);
 	if (ret != 0) {
-		error_exit(EXIT_FAILURE, 0, "%s: %s\n", opts->target, gai_strerror(ret));
+		error_exit(EXIT_FAILURE, 0, "%s: %s", opts->target, gai_strerror(ret));
 	}
 
 	// Extraer sockaddr_in

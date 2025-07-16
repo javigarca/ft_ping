@@ -56,6 +56,11 @@ int main (int argc, char **argv)
     gettimeofday(&stats.start_ping, NULL);
    
     while(1){
+        if (opts.count && seq > opts.count){
+            print_summary(&stats);
+            break;        
+        }
+            
         send_packet(socket_fd, &opts, &stats, seq);
         //timestamp de comienzo de bucle
         struct timeval start, now;

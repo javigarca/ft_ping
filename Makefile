@@ -46,7 +46,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 -include $(DEPS)
 
-bonus: $(TARGET.B)
+bonus: setbonus $(TARGET.B)
 
 $(TARGET.B): $(OBJECTS.B)
 	@mkdir -p $(BINDIR)
@@ -63,6 +63,9 @@ setcap: all
 
 setpost: 
 	sudo setcap cap_net_raw+ep $(TARGET)
+
+setbonus:
+	sudo setcap cap_net_raw+ep $(TARGET.B)
 
 clean:
 	rm -rf $(OBJDIR)/*.o $(OBJDIR)/*.d

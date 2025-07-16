@@ -15,6 +15,7 @@
  typedef struct s_ping_options {
 	int 		verbose;
 	const char	*target;
+    int         count;
 } t_ping_options;
 
 /**

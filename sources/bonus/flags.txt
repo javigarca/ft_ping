@@ -1,0 +1,88 @@
+Flags de un solo carácter
+
+    -d
+    Activa SO_DEBUG sobre el socket
+    manpages.debian.org
+    .
+
+    -f
+    Flood ping. Envía tan rápido como vuelven o 100×/s: “.” por request, “” por reply (requiere super-usuario)
+    manpages.debian.org
+    .
+
+    -i wait
+    Espera wait segundos entre cada envío (incompatible con -f)
+    manpages.debian.org
+    .
+
+    -l preload
+    Envía preload paquetes tan rápido como pueda antes de caer a su modo normal
+    manpages.debian.org
+    .
+
+    -n
+    Solo salida numérica; sin resolver nombres
+    manpages.debian.org
+    .
+
+    -p pattern
+    Usa hasta 16 octetos de relleno con el patrón en hexadecimal
+    manpages.debian.org
+    .
+
+    -q
+    Modo “quiet”: solo muestra resumen inicial y final
+    manpages.debian.org
+    .
+
+    -R
+    Activa la opción Record-Route en el IP header y muestra la ruta en los replies
+    manpages.debian.org
+    .
+
+    -r
+    Bypassea la tabla de rutas; envía directamente a un host en la LAN local
+    manpages.debian.org
+    .
+
+    -s packetsize
+    Tamaño de data (payload) en bytes; por defecto 56 (→ 64 bytes ICMP)
+    manpages.debian.org
+    .
+
+Long options
+
+    --address, --mask
+    Envía ICMP_ADDRESS (request de netmask)
+    GNU
+    .
+
+    --timestamp
+    Envía ICMP_TIMESTAMP
+    GNU
+    .
+    
+    
+--address        Send ICMP_ADDRESS packets
+--mask           Same as --address
+****--echo           Send ICMP_ECHO packets (default)
+--timestamp      Send ICMP_TIMESTAMP packets
+-t, --type=type  Send type packets (address, echo, mask, timestamp)
+****-c count         Stop after sending (and receiving) count ECHO_RESPONSE packets
+-d, --debug      Set SO_DEBUG option on the socket being used
+-f, --flood      Flood ping
+-i wait, --interval=wait
+                 Wait wait seconds between each packet sent
+-l preload, --preload=preload
+                 Send preload packets as fast as possible before falling into normal mode
+-n, --numeric    Numeric output only
+-p pattern, --pattern=pattern
+                 Specifies up to 16 “pad” bytes to fill out the packet
+-q, --quiet      Quiet output
+-R, --record-route
+                 Record route in the IP header and print it on replies
+-r, --route      Bypass routing tables
+-s packetsize, --size=packetsize
+                 Specifies the number of data bytes to be sent (default 56)
+****-v, --verbose    Verbose output (show ICMP other than echo-reply)
+****-?, --help       Display this help and exit

@@ -5,6 +5,7 @@
 #include <stdio.h>      
 #include <stdlib.h>     
 #include <errno.h>
+#include <limits.h>
 
 #include "ft_ping_bonus.h"
 #include "ft_ping_structs_bonus.h"
@@ -26,9 +27,9 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
 
     int i = 1;
     int hostcont = 0;
-
+    char *val = NULL;
     while (argv[i]) {
-        if (argv[i][0] == '-') {
+        if (argv[i][0] == '-' && argv[i][1] != '\0') {
             if (argv[i][1] == '-'){
                 if (!strcmp(argv[i], "--help")){
                         print_help();
@@ -51,6 +52,29 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                         case '?': 
                             print_help(); 
                             exit(EXIT_SUCCESS);
+                        case 'c':
+                            // Caso "-c123" (sin espacio)
+                            if (argv[i][j+1] != '\0') {
+                                val = &argv[i][j+1];
+                            } else {
+                                // Caso "-c 123" (espacio separado)
+                                if (i + 1 >= argc)
+                                    error_exit(EXIT_FAILURE, 0, "Option -c requires an argument");
+                                val = argv[++i];
+                            }
+                            errno = 0;
+                            char *endptr;
+                            long cnt = strtol(val, &endptr, 10);
+                            if (*endptr != '\0') 
+                                error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", val);
+                            if (errno == ERANGE)
+                                error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", val, LONG_MAX);
+                            if (cnt < 1)
+                                error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", val, LONG_MAX);
+                            opts->count = (int)cnt;
+                            // Salimos del inner-loop para no reexaminar los dígitos de "123"
+                            j = strlen(argv[i]) - 1;
+                            break;
                         default: 
                             error_exit(EXIT_FAILURE, 0, "Unknown option: -%c", argv[i][j]);
                     }
@@ -100,7 +124,7 @@ int resolve_target(t_ping_options *opts, t_target *t_out){
 	// Resolver
 	ret = getaddrinfo(opts->target, NULL, &hints, &result);
 	if (ret != 0) {
-		error_exit(EXIT_FAILURE, 0, "%s: %s\n", opts->target, gai_strerror(ret));
+		error_exit(EXIT_FAILURE, 0, "%s: %s", opts->target, gai_strerror(ret));
 	}
 
 	// Extraer sockaddr_in
