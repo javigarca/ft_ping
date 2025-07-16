@@ -10,22 +10,29 @@
 #                                                                              #
 # **************************************************************************** #
 
-TARGET = $(BINDIR)/ft_ping
+TARGET    = $(BINDIR)/ft_ping
+TARGET.B  = $(BINDIR)/ft_ping_bonus
 
+OBJDIR    = obj
+SRCDIR    = sources
+HDRDIR    = headers
+SRCDIR.B  = sources/bonus
+HDRDIR.B  = headers/bonus
+BINDIR    = bin
 
+HEADERS   = -I./$(HDRDIR)
+SOURCES   = $(wildcard $(SRCDIR)/*.c)
+OBJECTS   = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
+DEPS      = $(OBJECTS:.o=.d)
 
-OBJDIR = obj
-SRCDIR = sources
-HDRDIR = headers
-BINDIR = bin
+HEADERS.B = -I./$(HDRDIR.B)
+SOURCES.B = $(wildcard $(SRCDIR.B)/*.c)
+OBJECTS.B = $(patsubst $(SRCDIR.B)/%.c, $(OBJDIR)/%.o, $(SOURCES.B))
+DEPS.B    = $(OBJECTS.B:.o=.d)
 
-HEADERS = -I./$(HDRDIR)
-SOURCES = $(wildcard $(SRCDIR)/*.c)
-OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
-DEPS = $(OBJECTS:.o=.d)
-
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror $(HEADERS)
+CC        = gcc
+CFLAGS    = -Wall -Wextra -Werror $(HEADERS)
+CFLAGS.B  = -Wall -Wextra -Werror $(HEADERS.B)
 
 all: $(TARGET)
 
@@ -39,6 +46,18 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 -include $(DEPS)
 
+bonus: $(TARGET.B)
+
+$(TARGET.B): $(OBJECTS.B)
+	@mkdir -p $(BINDIR)
+	$(CC) $(CFLAGS.B) -o $@ $^ -lm
+
+$(OBJDIR)/%.o: $(SRCDIR.B)/%.c
+	@mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS.B) -MMD -MP -c $< -o $@
+
+-include $(DEPS.B)
+
 setcap: all
 	sudo setcap cap_net_raw+ep $(TARGET)
 
@@ -50,6 +69,7 @@ clean:
 
 fclean: clean
 	rm -f $(TARGET)
+	rm -f $(TARGET.B)
 	rm -rf $(BINDIR)
 
 re: fclean all

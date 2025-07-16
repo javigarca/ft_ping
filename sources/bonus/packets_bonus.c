@@ -10,9 +10,9 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "ft_ping.h"
-#include "ft_ping_definitions.h"
-#include "ft_ping_structs.h"
+#include "ft_ping_bonus.h"
+#include "ft_ping_definitions_bonus.h"
+#include "ft_ping_structs_bonus.h"
 
 /**
  * @brief funcion para emnviar un paquete de echo a través del socket
@@ -55,7 +55,11 @@ int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t
 		return -1;
 	}
 
+	// 6. Verbose // quitar mas tarde
+	//print_infof(opts->verbose, stdout, "Sent ICMP echo seq=%d (%ld bytes)", seq, sent_bytes);
+    
     stats->transmitted++;
+
 	return (0);
 }
 
@@ -187,3 +191,21 @@ uint16_t calc_checksum(const void *data, size_t len)
 	// One's complement and return
 	return ~sum & 0xFFFF;
 }
+
+/**
+ * @brief Función para extraer el ttl de un buffer de control 
+ * 
+ * @param msg el buffer de control
+ * @return int el valor de ttl, si -1 es no encontrado
+ */
+/*
+int extract_ttl(struct msghdr *msg) {
+    for (struct cmsghdr *cmsg = CMSG_FIRSTHDR(msg);
+         cmsg != NULL;
+         cmsg = CMSG_NXTHDR(msg, cmsg)) {
+        if (cmsg->cmsg_level == IPPROTO_IP && cmsg->cmsg_type == IP_TTL)
+            return *(int *)CMSG_DATA(cmsg);
+    }
+    return -1; // No TTL found
+}
+*/

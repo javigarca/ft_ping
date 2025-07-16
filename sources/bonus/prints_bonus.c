@@ -5,7 +5,7 @@
 #include <math.h>
 #include <sys/time.h>
 #include <time.h>
-#include "ft_ping.h"
+#include "ft_ping_bonus.h"
 
 /**
  * @brief Función de impresion de ayuda copleta del programa
@@ -16,6 +16,9 @@ void    print_help(){
     printf("Options:\n");
     printf("  --usage            display usage and exit\n");
     printf("  -v, --verbose      verbose output\n");
+   // printf("  -c <count>         stop after <count> replies\n");
+   // printf("  -i <interval>      wait interval seconds between sending each packet\n");
+   // printf("  -t <ttl>           set the TTL (time to live)\n");
     printf("  -?, --help         display this help and exit\n");
 }
 
