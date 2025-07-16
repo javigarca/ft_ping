@@ -70,7 +70,6 @@ void    print_summary(t_stats *stats){
     struct timeval end_ping;
     gettimeofday(&end_ping, NULL);
     long elapsed_time = (end_ping.tv_sec - stats->start_ping.tv_sec) * 1000 + (end_ping.tv_usec - stats->start_ping.tv_usec) / 1000;
-    //uint16_t elapsed_time = stats->start_ping - ft_time_now_us();
 
 	if (stats->transmitted > 0)
 		loss = 100.0 * (stats->transmitted - stats->received) / stats->transmitted;
@@ -92,7 +91,7 @@ void    print_summary(t_stats *stats){
 }
 
 /**
- * @brief Función para mensajes en función de verbose
+ * @brief Función para imprimir mensajes en función de verbose
  * 
  * @param verbose valor del flag  
  * @param fmt Cadena de formato estilo printf para el mensaje personalizado.

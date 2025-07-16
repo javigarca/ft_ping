@@ -66,6 +66,13 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
     }
 }
 
+/**
+ * @brief Valida el host introducido por el usuario y lo introudce en target. devuelve 0 si todo bien
+ * 
+ * @param opts 
+ * @param t_out 
+ * @return int 
+ */
 int resolve_target(t_ping_options *opts, t_target *t_out){
     if (!opts->target || strlen(opts->target) == 0)
 	    error_exit(EXIT_FAILURE, 0, "Empty host name");
@@ -106,6 +113,13 @@ int resolve_target(t_ping_options *opts, t_target *t_out){
 	return (0);
 }
 
+/**
+ * @brief Devuelve la información de tipo de socket y familia. devulve 0 si todo bien
+ * 
+ * @param sockfd 
+ * @param stats 
+ * @return int 
+ */
 int get_socket_info(int sockfd, t_stats *stats) {
     socklen_t optlen = sizeof(int);
 

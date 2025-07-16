@@ -26,6 +26,6 @@
  int        receive_packet(int sockfd, uint16_t sent_seq, const t_ping_options *opts, t_stats *stats);
  uint64_t   ft_time_now_us(void);
  uint16_t   calc_checksum(const void *data, size_t len);
- int        extract_ttl(struct msghdr *msg);
+ //int        extract_ttl(struct msghdr *msg);
   
  #endif

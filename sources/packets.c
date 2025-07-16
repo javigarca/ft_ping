@@ -14,6 +14,15 @@
 #include "ft_ping_definitions.h"
 #include "ft_ping_structs.h"
 
+/**
+ * @brief funcion para emnviar un paquete de echo a través del socket
+ * 
+ * @param sockfd fd del socket
+ * @param opts objeto con las flags
+ * @param stats objeto con las estadísticas y demas info pertinente
+ * @param seq número de sequencia de envío 
+ * @return int valor devuelto, 0 todo bien, -1 fallo de envío del paquete(sistema)
+ */
 int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t seq){
     t_packet    packet;
 	uint64_t    now;
@@ -54,6 +63,15 @@ int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t
 	return (0);
 }
 
+/**
+ * @brief Funcíon para validar paquete de respuesta a echo, actualización de estadiśticas
+ * 
+ * @param sockfd fd del socket  
+ * @param sent_seq número de sequencia
+ * @param opts objeto con las flags
+ * @param stats objeto con las estadísticas y demas info pertinente
+ * @return int devuelve uno si todo bien. esto es por claridad pues en main esta funcion hace salir del bucle si todo bien
+ */
 int receive_packet(int sockfd, uint16_t sent_seq, const t_ping_options *opts, t_stats *stats){
 
     char recv_buf[1024];
@@ -180,6 +198,7 @@ uint16_t calc_checksum(const void *data, size_t len)
  * @param msg el buffer de control
  * @return int el valor de ttl, si -1 es no encontrado
  */
+/*
 int extract_ttl(struct msghdr *msg) {
     for (struct cmsghdr *cmsg = CMSG_FIRSTHDR(msg);
          cmsg != NULL;
@@ -189,4 +208,4 @@ int extract_ttl(struct msghdr *msg) {
     }
     return -1; // No TTL found
 }
-
+*/

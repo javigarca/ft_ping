@@ -61,7 +61,6 @@ typedef struct s_stats {
 	t_target		target;
 	t_socket_info	socket_i;
 	struct timeval	start_ping; 
-	//uint16_t		start_ping;
 } t_stats;
 
 /**
@@ -92,7 +91,7 @@ typedef struct s_packet {
 
 #endif
 
-/*
+/* Estructuras de librerias 
 struct iphdr {
     #if __BYTE_ORDER == __LITTLE_ENDIAN
         unsigned int ihl:4;

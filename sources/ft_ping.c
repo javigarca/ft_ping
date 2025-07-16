@@ -50,7 +50,7 @@ int main (int argc, char **argv)
 
     int seq = 1;
     gettimeofday(&stats.start_ping, NULL);
-   //stats.start_ping = ft_time_now_us();
+   
     while(1){
         send_packet(socket_fd, &opts, &stats, seq);
         //timestamp de comienzo de bucle
