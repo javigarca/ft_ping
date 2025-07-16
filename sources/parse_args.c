@@ -113,7 +113,6 @@ int resolve_target(t_ping_options *opts, t_target *t_out){
 		error_exit(EXIT_FAILURE, errno, "inet_ntop");
 	}
 
-	// Guardar hostname original si lo vas a usar (opcional)
 	t_out->hostname = opts->target; 
 
 	freeaddrinfo(result);
