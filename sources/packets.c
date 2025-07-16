@@ -56,7 +56,7 @@ int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t
 	}
 
 	// 6. Verbose // quitar mas tarde
-	print_infof(opts->verbose, stdout, "Sent ICMP echo seq=%d (%ld bytes)", seq, sent_bytes);
+	//print_infof(opts->verbose, stdout, "Sent ICMP echo seq=%d (%ld bytes)", seq, sent_bytes);
     
     stats->transmitted++;
 
@@ -120,7 +120,7 @@ int receive_packet(int sockfd, uint16_t sent_seq, const t_ping_options *opts, t_
     double rtt = (now - sent) / 1000.0;
 
     // Imprimir línea
-    printf("%d bytes from %s: icmp_seq=%d ident=%d ttl=%d time=%.1f ms\n", icmp_len, ip_str, ntohs(icmp->un.echo.sequence), ntohs(icmp->un.echo.id), ttl, rtt);
+    printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n", icmp_len, ip_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
 
     // Actualizar estadísticas
     stats->received++;

@@ -19,8 +19,10 @@
 
 void parse_args(int argc, char *argv[], t_ping_options *opts){
 
-    if (argc < 2)
-        error_exit(EXIT_FAILURE, 0, "Usage: ft_ping [options] host.");
+    if (argc < 2){
+        print_usage();
+        exit(EXIT_SUCCESS);
+    }
 
     int i = 1;
     int hostcont = 0;
@@ -32,9 +34,14 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                         print_help();
                         exit(EXIT_SUCCESS);
                     }
-                if (!strcmp(argv[i], "--verbose")){
-                    opts->verbose = 1;
-                }
+                    if (!strcmp(argv[i], "--verbose")){
+                        opts->verbose = 1;
+                    }
+                    if (!strcmp(argv[i], "--usage")){
+                        print_usage();
+                        exit(EXIT_SUCCESS);
+                    }
+                    error_exit(EXIT_FAILURE, 0, "Unknown option: %s", argv[i]);   
             } else {
                 for (int j = 1; argv[i][j]; j++){
                     switch (argv[i][j]) {

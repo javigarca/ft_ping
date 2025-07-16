@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include "ft_ping.h"
+#include "ft_ping_definitions.h"
 #include "ft_ping_structs.h"
 
 /**
@@ -33,8 +34,11 @@ int main (int argc, char **argv)
     signal(SIGINT, handle_sigint);
 
     int socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
-    if (socket_fd < 0)
+    if (socket_fd < 0){
+        if (errno == EPERM || errno == EACCES || errno == EPROTONOSUPPORT)
+		    error_exit(EXIT_FAILURE, 0, "ft_ping: Lacking privilege for icmp socket.\n");
         error_exit(EXIT_FAILURE, errno, "socket" );
+    }
     //Activar IP_RECVTTL en el socket:
     int opt = 1;
     setsockopt(socket_fd, IPPROTO_IP, IP_RECVTTL, &opt, sizeof(opt));
@@ -44,9 +48,9 @@ int main (int argc, char **argv)
     get_socket_info(socket_fd, &stats);
   
     ////impresión cabeceras
-    print_infof(opts.verbose, stderr, "ft_ping: sock4.fd: %d (socktype: %s), sock6.fd: -1 (not used), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);
+    print_infof(opts.verbose, stderr, "ft_ping: sock4.fd: %d (socktype: %s), sock6.fd: -1 (socktype: 0), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);
     print_infof(opts.verbose,stdout, "ai->ai_family: %s, ai->ai-canonname: '%s'", stats.socket_i.family_str, stats.target.hostname);
-    print_infof(1, stdout, "PING %s (%s) %d data bytes", stats.target.hostname, stats.target.ip_str, PAYLOAD_SIZE);
+    print_infof(1, stdout, "PING %s (%s) %d(%d) bytes of data.", stats.target.hostname, stats.target.ip_str, PAYLOAD_SIZE, WIRE_BYTES);
 
     int seq = 1;
     gettimeofday(&stats.start_ping, NULL);
@@ -57,7 +61,7 @@ int main (int argc, char **argv)
         struct timeval start, now;
         gettimeofday(&start, NULL);
 
-        int got_reply = 0;
+        //int got_reply = 0;
         while (1) {
             // cálculo tiempo restante 
             gettimeofday(&now, NULL);
@@ -84,14 +88,14 @@ int main (int argc, char **argv)
 
             //analisis de packete
             if (receive_packet(socket_fd, seq, &opts, &stats)) {
-                got_reply = 1;
+          //      got_reply = 1;
                 break;
             }
             /*si no es correcto el paquete o no encontramos nada, empezamos bucle otra vez */
         }
 
-        if (!got_reply)
-            print_infof(1, stderr, "Request timeout for icmp_seq %d\n", seq); 
+      //  if (!got_reply)
+      //      print_infof(opts.verbose, stderr, "Request timeout for icmp_seq %d\n", seq); 
         seq++;
         sleep(1);
     }

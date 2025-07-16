@@ -10,7 +10,9 @@
 
  // ICMP tamaños
  #define ICMP_HEADER_LEN    8
+ #define IP_HEADER_LEN      20
  #define PAYLOAD_SIZE       56       
  #define ICMP_PACKET_LEN    (ICMP_HEADER_LEN + PAYLOAD_SIZE)
+ #define WIRE_BYTES         (IP_HEADER_LEN + ICMP_HEADER_LEN + PAYLOAD_SIZE)  // 84
 
 #endif

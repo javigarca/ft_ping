@@ -12,8 +12,9 @@
  * 
  */
 void    print_help(){
-    printf("Usage: ft_ping [options] host\n");
+    printf("\nUsage:\n  ft_ping [options] <destination>\n");
     printf("Options:\n");
+    printf("  --usage            display usage and exit\n");
     printf("  -v, --verbose      verbose output\n");
    // printf("  -c <count>         stop after <count> replies\n");
    // printf("  -i <interval>      wait interval seconds between sending each packet\n");
@@ -26,7 +27,7 @@ void    print_help(){
  * 
  */
 void    print_usage(void){
-    printf("Usage: ft_ping [options] host\n");
+    printf("\nUsage: ft_ping [options] host\n");
     printf("Try 'ft_ping --help' or 'ft_ping -?' for more information.\n");
 }
 
@@ -74,8 +75,8 @@ void    print_summary(t_stats *stats){
 	if (stats->transmitted > 0)
 		loss = 100.0 * (stats->transmitted - stats->received) / stats->transmitted;
 
-	printf("\n--- %s ft_ping statistics ---\n", stats->target.hostname);
-	printf("%d packets transmitted, %d received, %.0f%% packet loss, time %ld\n",
+	printf("\n--- %s ping statistics ---\n", stats->target.hostname);
+	printf("%d packets transmitted, %d received, %.0f%% packet loss, time %ldms\n",
 		stats->transmitted, stats->received, loss, elapsed_time);
 
 	if (stats->received > 0) {
