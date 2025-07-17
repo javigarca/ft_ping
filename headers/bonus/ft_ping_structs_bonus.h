@@ -16,6 +16,7 @@
 	int 		verbose;
 	const char	*target;
     int         count;
+    double      interval;
 } t_ping_options;
 
 /**

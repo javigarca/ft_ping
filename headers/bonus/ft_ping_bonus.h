@@ -17,6 +17,7 @@
  void       parse_args(int argc, char *argv[], t_ping_options *opts);
  int        resolve_target(t_ping_options *opts, t_target *t_out);
  int        get_socket_info(int sockfd, t_stats *stats);
+ void       validate_flag_arg(char *value, char flag, t_ping_options *opts);
 
  //**** main.c ****//
  void       handle_sigint(int signum);

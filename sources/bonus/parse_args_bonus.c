@@ -28,6 +28,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
     int i = 1;
     int hostcont = 0;
     char *val = NULL;
+
     while (argv[i]) {
         if (argv[i][0] == '-' && argv[i][1] != '\0') {
             if (argv[i][1] == '-'){
@@ -52,6 +53,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                         case '?': 
                             print_help(); 
                             exit(EXIT_SUCCESS);
+                        case 'i':
                         case 'c':
                             // Caso "-c123" (sin espacio)
                             if (argv[i][j+1] != '\0') {
@@ -62,16 +64,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                                     error_exit(EXIT_FAILURE, 0, "Option -c requires an argument");
                                 val = argv[++i];
                             }
-                            errno = 0;
-                            char *endptr;
-                            long cnt = strtol(val, &endptr, 10);
-                            if (*endptr != '\0') 
-                                error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", val);
-                            if (errno == ERANGE)
-                                error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", val, LONG_MAX);
-                            if (cnt < 1)
-                                error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", val, LONG_MAX);
-                            opts->count = (int)cnt;
+                            validate_flag_arg(val, argv[i][j], opts);
                             // Salimos del inner-loop para no reexaminar los dígitos de "123"
                             j = strlen(argv[i]) - 1;
                             break;
@@ -169,4 +162,31 @@ int get_socket_info(int sockfd, t_stats *stats) {
                     (stats->socket_i.family == AF_INET6) ? "AF_INET6" : "UNSPEC";
     
     return(0);
+}
+
+/**
+ * @brief Función para validar el argumento de las flag que aceptan un número de arg como -c e -i. Salimos con error en caso negativo
+ * 
+ * @param value valor que recibimos del argumento
+ * @return long devolvemos el valor si es correcto
+ */
+void validate_flag_arg(char *value, char flag, t_ping_options *opts){
+    errno = 0;
+    char *endptr;
+    if (flag == 'c'){
+        long cnt = strtol(value, &endptr, 10);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if (errno == ERANGE || cnt < 1)
+            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", value, LONG_MAX);
+        opts->count = (int)cnt;
+    }
+    if (flag == 'i'){
+        double interval = strtod(value, &endptr);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if (errno == ERANGE || interval <=0.0)
+            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", value, LONG_MAX);
+        opts->interval = interval;
+    }
 }

@@ -63,26 +63,26 @@ Long options
     .
     
     
---address        Send ICMP_ADDRESS packets
---mask           Same as --address
-****--echo           Send ICMP_ECHO packets (default)
---timestamp      Send ICMP_TIMESTAMP packets
+(B)--address        Send ICMP_ADDRESS packets
+   --mask           Same as --address
+(m)****--echo           Send ICMP_ECHO packets (default)
+(B)--timestamp      Send ICMP_TIMESTAMP packets
 -t, --type=type  Send type packets (address, echo, mask, timestamp)
-****-c count         Stop after sending (and receiving) count ECHO_RESPONSE packets
+(B)****-c count         Stop after sending (and receiving) count ECHO_RESPONSE packets
 -d, --debug      Set SO_DEBUG option on the socket being used
--f, --flood      Flood ping
--i wait, --interval=wait
+(B)-f, --flood      Flood ping
+(B)-i wait, --interval=wait
                  Wait wait seconds between each packet sent
 -l preload, --preload=preload
                  Send preload packets as fast as possible before falling into normal mode
 -n, --numeric    Numeric output only
--p pattern, --pattern=pattern
+(B)-p pattern, --pattern=pattern
                  Specifies up to 16 “pad” bytes to fill out the packet
 -q, --quiet      Quiet output
 -R, --record-route
                  Record route in the IP header and print it on replies
 -r, --route      Bypass routing tables
--s packetsize, --size=packetsize
+(B)-s packetsize, --size=packetsize
                  Specifies the number of data bytes to be sent (default 56)
-****-v, --verbose    Verbose output (show ICMP other than echo-reply)
-****-?, --help       Display this help and exit
+(m)****-v, --verbose    Verbose output (show ICMP other than echo-reply)
+(m)****-?, --help       Display this help and exit

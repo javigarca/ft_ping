@@ -48,13 +48,22 @@ int main (int argc, char **argv)
     get_socket_info(socket_fd, &stats);
   
     ////impresión cabeceras
-    print_infof(opts.verbose, stderr, "ft_ping: sock4.fd: %d (socktype: %s), sock6.fd: -1 (socktype: 0), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);
+    print_infof(opts.verbose, stderr, "ft_ping: sock4.fd: %d (socktype: %s), sock6.fd: -1 (not used), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);
     print_infof(opts.verbose,stdout, "ai->ai_family: %s, ai->ai-canonname: '%s'", stats.socket_i.family_str, stats.target.hostname);
     print_infof(1, stdout, "PING %s (%s) %d(%d) bytes of data.", stats.target.hostname, stats.target.ip_str, PAYLOAD_SIZE, WIRE_BYTES);
 
     int seq = 1;
     gettimeofday(&stats.start_ping, NULL);
-   
+
+    double interval_us;
+    if (opts.interval > 0.0) {
+        interval_us = opts.interval;
+    } else {
+        interval_us = 1;
+    }
+    
+    //print_infof(1, stderr,"****** INTERVAL %f -- %f ********\n", opts.interval, interval_us);
+
     while(1){
         if (opts.count && seq > opts.count){
             print_summary(&stats);
@@ -72,7 +81,7 @@ int main (int argc, char **argv)
             gettimeofday(&now, NULL);
             double elapsed = (now.tv_sec - start.tv_sec)
                         + (now.tv_usec - start.tv_usec)/1e6;
-            double left = 1.0 - elapsed;
+            double left = interval_us - elapsed;
             if (left <= 0.0)
                 break;
 
@@ -93,16 +102,12 @@ int main (int argc, char **argv)
 
             //analisis de packete
             if (receive_packet(socket_fd, seq, &opts, &stats)) {
-          //      got_reply = 1;
                 break;
             }
             /*si no es correcto el paquete o no encontramos nada, empezamos bucle otra vez */
         }
-
-      //  if (!got_reply)
-      //      print_infof(opts.verbose, stderr, "Request timeout for icmp_seq %d\n", seq); 
         seq++;
-        sleep(1);
+        usleep(interval_us *1e6);
     }
     return (EXIT_SUCCESS);
 }

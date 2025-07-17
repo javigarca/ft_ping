@@ -46,7 +46,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 -include $(DEPS)
 
-bonus: setbonus $(TARGET.B)
+bonus: $(TARGET.B) setbonus
 
 $(TARGET.B): $(OBJECTS.B)
 	@mkdir -p $(BINDIR)
