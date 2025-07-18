@@ -20,9 +20,6 @@ Flags de un solo carácter
     manpages.debian.org
     .
 
-    -p pattern
-    Usa hasta 16 octetos de relleno con el patrón en hexadecimal
-    manpages.debian.org
     .
 
     -q
@@ -71,7 +68,7 @@ Long options
 -l preload, --preload=preload
                  Send preload packets as fast as possible before falling into normal mode
 -n, --numeric    Numeric output only
-(B)-p pattern, --pattern=pattern
+(B)****-p pattern, --pattern=pattern
                  Specifies up to 16 “pad” bytes to fill out the packet
 -q, --quiet      Quiet output
 -R, --record-route
@@ -81,3 +78,39 @@ Long options
                  Specifies the number of data bytes to be sent (default 56)
 (m)****-v, --verbose    Verbose output (show ICMP other than echo-reply)
 (m)****-?, --help       Display this help and exit
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+únicamente estas seis son válidas en el ping de GNU Inetutils 2.0:
+
+    -f (flood ping)
+    manpages.debian.org
+
+    -l (preload)
+    manpages.debian.org
+
+    -n (numeric output)
+    manpages.debian.org
+
+    -p (pattern)
+    manpages.debian.org
+
+    -r (bypass routing tables)
+    manpages.debian.org
+
+    -s (packetsize)
+    manpages.debian.org
+
+Las demás no existen en Inetutils 2.0:
+
+    -w y -W pertenecen a iputils-ping, no a Inetutils
+
+    -T (mayúscula) no está definido (Inetutils usa --timestamp, no -T)
+    GNU
+
+    --ttl y --ip-timestamp no forman parte del set de opciones de Inetutils
+
+-timestamp, usa exactamente --timestamp (sin ip-) o, para el tipo ICMP, las opciones de selección de paquete (-t/--type=) que ofrece Inetutils GNU
+.

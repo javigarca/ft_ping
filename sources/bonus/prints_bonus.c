@@ -19,6 +19,7 @@ void    print_help(){
     printf("  -c <count>         stop after <count> replies\n");
     printf("  -i <interval>      wait interval seconds between sending each packet\n");
     printf("  -p <pattern>       specify up to 16 pad bytes to fill out the packet you send\n");
+    printf("  -s <packetsize>    specifies the number of data bytes to be sent (default 56)\n");
    // printf("  -t <ttl>           set the TTL (time to live)\n");
     printf("  -?, --help         display this help and exit\n");
 }

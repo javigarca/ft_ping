@@ -19,7 +19,9 @@
     double      interval;
     uint8_t     pattern[MAX_PATTERN_LEN];
     size_t      pattern_len;     
-    int         pattern_use;     
+    int         pattern_use;
+    size_t      payload_size;
+    int         payload_size_use;     
 } t_ping_options;
 
 /**

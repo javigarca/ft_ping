@@ -15,7 +15,9 @@
  #define ICMP_PACKET_LEN    (ICMP_HEADER_LEN + PAYLOAD_SIZE)
  #define WIRE_BYTES         (IP_HEADER_LEN + ICMP_HEADER_LEN + PAYLOAD_SIZE)  // 84
 
-//Tamaño del patron introducido por el usuario
+//Tamaño maximos introducidos por el usuario
  #define MAX_PATTERN_LEN    16
+ #define MAX_PAYLOAD_IP4    65535
+ #define MAX_PAYLOAD_SIZE   MAX_PAYLOAD_IP4 - IP_HEADER_LEN - ICMP_HEADER_LEN  // 65 535(protocolo ip4) − 20 − 8 
 
 #endif

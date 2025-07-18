@@ -55,6 +55,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                         case '?': 
                             print_help(); 
                             exit(EXIT_SUCCESS);
+                        case 's':
                         case 'p':
                         case 'i':
                         case 'c':
@@ -63,7 +64,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                                 val = &argv[i][j+1];
                             } else {
                                 // Caso "-c 123" (espacio separado)
-                                if (i + 1 >= argc)
+                                if (i + 1 >=argc)
                                     error_exit(EXIT_FAILURE, 0, "Option -%c requires an argument", argv[i][j]);
                                 val = argv[++i];
                             }
@@ -205,5 +206,14 @@ void validate_flag_arg(char *value, char flag, t_ping_options *opts){
             opts->pattern[i] = (uint8_t)v;
         }
         opts->pattern_use = 1;
+    }
+    if (flag == 's'){
+        long sz = strtol(value, &endptr, 10);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if (errno == ERANGE || sz < 0 || sz > MAX_PAYLOAD_SIZE)
+            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", value, MAX_PAYLOAD_SIZE);
+        opts->payload_size = (size_t)sz;
+        opts->payload_size_use = 1;
     }
 }

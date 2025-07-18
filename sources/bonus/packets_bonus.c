@@ -43,7 +43,7 @@ int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t
     if (opts->pattern_use){
         for (size_t i = 0; i < PAYLOAD_SIZE; i++)
             packet.payload[i] = opts->pattern[i % opts->pattern_len];
-        print_pattern(opts);
+        //print_pattern(opts);
     }else {
 	    for (size_t i = sizeof(now); i < PAYLOAD_SIZE; i++)
 		    packet.payload[i] = 0x42; // patrón tipico
