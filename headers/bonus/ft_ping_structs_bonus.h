@@ -21,7 +21,11 @@
     size_t      pattern_len;     
     int         pattern_use;
     size_t      payload_size;
-    int         payload_size_use;     
+    int         payload_size_use;
+    int         ttl;
+    int         ttl_use;
+    int         route;
+    int         debug;
 } t_ping_options;
 
 /**

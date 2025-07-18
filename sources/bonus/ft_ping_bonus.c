@@ -40,8 +40,13 @@ int main (int argc, char **argv)
         error_exit(EXIT_FAILURE, errno, "socket" );
     }
     //Activar IP_RECVTTL en el socket:
-    int opt = 1;
+    int opt = opts.ttl_use ? opts.ttl : 1;
     setsockopt(socket_fd, IPPROTO_IP, IP_RECVTTL, &opt, sizeof(opt));
+    if (opts.route) {
+        int on = 1;
+        if (setsockopt(socket_fd, SOL_SOCKET, SO_DONTROUTE, &on, sizeof(on)) < 0)
+            error_exit(EXIT_FAILURE, errno, "setsockopt SO_DONTROUTE");
+    }
     
     if (resolve_target(&opts, &stats.target))
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");
@@ -63,8 +68,6 @@ int main (int argc, char **argv)
     } else {
         interval_us = 1;
     }
-    
-    //print_infof(1, stderr,"****** INTERVAL %f -- %f ********\n", opts.interval, interval_us);
 
     while(1){
         if (opts.count && seq > opts.count){
@@ -77,7 +80,6 @@ int main (int argc, char **argv)
         struct timeval start, now;
         gettimeofday(&start, NULL);
 
-        //int got_reply = 0;
         while (1) {
             // cálculo tiempo restante 
             gettimeofday(&now, NULL);

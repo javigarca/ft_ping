@@ -37,10 +37,7 @@ Flags de un solo carácter
     manpages.debian.org
     .
 
-    -s packetsize
-    Tamaño de data (payload) en bytes; por defecto 56 (→ 64 bytes ICMP)
-    manpages.debian.org
-    .
+
 
 Long options
 
@@ -63,7 +60,7 @@ Long options
 (B)****-c count         Stop after sending (and receiving) count ECHO_RESPONSE packets
 -d, --debug      Set SO_DEBUG option on the socket being used
 (B)-f, --flood      Flood ping
-(B)-i wait, --interval=wait
+(B)****-i wait, --interval=wait
                  Wait wait seconds between each packet sent
 -l preload, --preload=preload
                  Send preload packets as fast as possible before falling into normal mode
@@ -73,11 +70,13 @@ Long options
 -q, --quiet      Quiet output
 -R, --record-route
                  Record route in the IP header and print it on replies
--r, --route      Bypass routing tables
-(B)-s packetsize, --size=packetsize
+(B)****-r, --route      Bypass routing tables
+(B)****-s packetsize, --size=packetsize
                  Specifies the number of data bytes to be sent (default 56)
 (m)****-v, --verbose    Verbose output (show ICMP other than echo-reply)
 (m)****-?, --help       Display this help and exit
+
+(B)****-t (--ttl)
 
 
 

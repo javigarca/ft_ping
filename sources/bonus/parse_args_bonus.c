@@ -53,10 +53,17 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                         case 'v': 
                             opts->verbose=1;
                             break;
+                        case 'r': 
+                            opts->route=1;
+                            break;
+                        case 'd': 
+                            opts->debug=1;
+                            break;
                         case '?': 
                             print_help(); 
                             exit(EXIT_SUCCESS);
                         case 's':
+                        case 't':
                         case 'p':
                         case 'i':
                         case 'c':
@@ -88,7 +95,8 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
         i++;
     }
 
-    print_opts(opts);
+    if (opts->debug)
+        print_opts(opts);
     if (hostcont == 0) {
         error_exit(EXIT_FAILURE, 0, "Missing host operand");
     }
@@ -218,5 +226,14 @@ void validate_flag_arg(char *value, char flag, t_ping_options *opts){
             error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", value, MAX_PAYLOAD_SIZE);
         opts->payload_size = (size_t)sz;
         opts->payload_size_use = 1;
+    }
+    if (flag == 't'){
+        long ttl = strtol(value, &endptr, 10);
+        if (*endptr != '\0') 
+            error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+        if (errno == ERANGE || ttl <= 0 || ttl > 255)
+            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= 255", value);
+        opts->ttl = ttl;
+        opts->ttl_use = 1;
     }
 }

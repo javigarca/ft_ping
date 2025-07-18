@@ -21,7 +21,8 @@ void    print_help(){
     printf("  -i <interval>      wait interval seconds between sending each packet\n");
     printf("  -p <pattern>       specify up to 16 pad bytes to fill out the packet you send\n");
     printf("  -s <packetsize>    specifies the number of data bytes to be sent (default 56)\n");
-   // printf("  -t <ttl>           set the TTL (time to live)\n");
+    printf("  -t <ttl>           set the TTL (time to live)\n");
+    printf("  -r, --route        Bypass routing tables");
     printf("  -?, --help         display this help and exit\n");
 }
 
@@ -140,7 +141,7 @@ void print_opts(const t_ping_options *opts) {
     printf("  count         = %d\n", opts->count);
     printf("  interval      = %.6f\n", opts->interval);
     printf("  target        = %s\n", opts->target ? opts->target : "(null)");
-
+    printf("  route         = %d\n", opts->route);
     printf("  use_pattern   = %d\n", opts->pattern_use);
     if (opts->pattern_use) {
         printf("  pattern_len   = %zu\n", opts->pattern_len);
