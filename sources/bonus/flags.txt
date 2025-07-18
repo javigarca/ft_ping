@@ -10,11 +10,6 @@ Flags de un solo carácter
     manpages.debian.org
     .
 
-    -i wait
-    Espera wait segundos entre cada envío (incompatible con -f)
-    manpages.debian.org
-    .
-
     -l preload
     Envía preload paquetes tan rápido como pueda antes de caer a su modo normal
     manpages.debian.org

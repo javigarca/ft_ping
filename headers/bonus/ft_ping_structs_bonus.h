@@ -17,6 +17,9 @@
 	const char	*target;
     int         count;
     double      interval;
+    uint8_t     pattern[MAX_PATTERN_LEN];
+    size_t      pattern_len;     
+    int         pattern_use;     
 } t_ping_options;
 
 /**

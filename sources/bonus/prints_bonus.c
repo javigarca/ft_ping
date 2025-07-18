@@ -16,8 +16,9 @@ void    print_help(){
     printf("Options:\n");
     printf("  --usage            display usage and exit\n");
     printf("  -v, --verbose      verbose output\n");
-   // printf("  -c <count>         stop after <count> replies\n");
-   // printf("  -i <interval>      wait interval seconds between sending each packet\n");
+    printf("  -c <count>         stop after <count> replies\n");
+    printf("  -i <interval>      wait interval seconds between sending each packet\n");
+    printf("  -p <pattern>       specify up to 16 pad bytes to fill out the packet you send\n");
    // printf("  -t <ttl>           set the TTL (time to live)\n");
     printf("  -?, --help         display this help and exit\n");
 }
@@ -108,3 +109,21 @@ void    print_summary(t_stats *stats){
 	va_end(args);
 	fprintf(stream, "\n");
  }
+/**
+ * @brief Función debug para imprimir el pattern introducido, en decimal y byte a byte
+ * 
+ * @param opts la estructura con los datos de las flags
+ */
+ void print_pattern(const t_ping_options *opts) {
+    if (!opts->pattern_use) {
+        printf("No pattern set\n");
+        return;
+    }
+    for (size_t i = 0; i < opts->pattern_len; i++) 
+        printf("Pattern valor byte(%zu): %u\n", i, (unsigned)opts->pattern[i]);
+    printf("Pattern (%zu bytes):", opts->pattern_len);
+    for (size_t i = 0; i < opts->pattern_len; i++) {
+        printf(" %02x", opts->pattern[i]);
+    }
+    printf("\n");    
+}

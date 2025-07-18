@@ -15,4 +15,7 @@
  #define ICMP_PACKET_LEN    (ICMP_HEADER_LEN + PAYLOAD_SIZE)
  #define WIRE_BYTES         (IP_HEADER_LEN + ICMP_HEADER_LEN + PAYLOAD_SIZE)  // 84
 
+//Tamaño del patron introducido por el usuario
+ #define MAX_PATTERN_LEN    16
+
 #endif

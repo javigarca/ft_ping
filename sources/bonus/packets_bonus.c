@@ -40,8 +40,14 @@ int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t
 	memcpy(packet.payload, &now, sizeof(now));
 
 	// Rellenar resto del payload
-	for (size_t i = sizeof(now); i < PAYLOAD_SIZE; i++)
-		packet.payload[i] = 0x42; // patrón arbitrario
+    if (opts->pattern_use){
+        for (size_t i = 0; i < PAYLOAD_SIZE; i++)
+            packet.payload[i] = opts->pattern[i % opts->pattern_len];
+        print_pattern(opts);
+    }else {
+	    for (size_t i = sizeof(now); i < PAYLOAD_SIZE; i++)
+		    packet.payload[i] = 0x42; // patrón tipico
+    }
 
 	//  Calcular checksum
 	packet.header.checksum = 0;
@@ -55,7 +61,7 @@ int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t
 		return -1;
 	}
 
-	// 6. Verbose // quitar mas tarde
+	// Debug. quitar mas tarde
 	//print_infof(opts->verbose, stdout, "Sent ICMP echo seq=%d (%ld bytes)", seq, sent_bytes);
     
     stats->transmitted++;

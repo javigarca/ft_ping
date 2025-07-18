@@ -12,6 +12,7 @@
  void       error_exit(int status, int errnum, const char *fmt, ...);
  void       print_summary(t_stats *stats);
  void       print_infof(int verbose, FILE *stream, const char *fmt, ...);
+ void       print_pattern(const t_ping_options *opts);
 
  //**** parse_args.c ****//
  void       parse_args(int argc, char *argv[], t_ping_options *opts);

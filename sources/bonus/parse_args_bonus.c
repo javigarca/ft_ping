@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <unistd.h>
 #include <string.h>     // memset, strerror
 #include <netdb.h>      // getaddrinfo, freeaddrinfo, addrinfo
@@ -8,6 +9,7 @@
 #include <limits.h>
 
 #include "ft_ping_bonus.h"
+#include "ft_ping_definitions_bonus.h"
 #include "ft_ping_structs_bonus.h"
 
 /**
@@ -53,6 +55,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                         case '?': 
                             print_help(); 
                             exit(EXIT_SUCCESS);
+                        case 'p':
                         case 'i':
                         case 'c':
                             // Caso "-c123" (sin espacio)
@@ -61,7 +64,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                             } else {
                                 // Caso "-c 123" (espacio separado)
                                 if (i + 1 >= argc)
-                                    error_exit(EXIT_FAILURE, 0, "Option -c requires an argument");
+                                    error_exit(EXIT_FAILURE, 0, "Option -%c requires an argument", argv[i][j]);
                                 val = argv[++i];
                             }
                             validate_flag_arg(val, argv[i][j], opts);
@@ -168,7 +171,7 @@ int get_socket_info(int sockfd, t_stats *stats) {
  * @brief Función para validar el argumento de las flag que aceptan un número de arg como -c e -i. Salimos con error en caso negativo
  * 
  * @param value valor que recibimos del argumento
- * @return long devolvemos el valor si es correcto
+ * 
  */
 void validate_flag_arg(char *value, char flag, t_ping_options *opts){
     errno = 0;
@@ -188,5 +191,19 @@ void validate_flag_arg(char *value, char flag, t_ping_options *opts){
         if (errno == ERANGE || interval <=0.0)
             error_exit(EXIT_FAILURE, 0, "invalid argument: '%s': out of range: 1 <= value <= %ld", value, LONG_MAX);
         opts->interval = interval;
+    }
+    if (flag == 'p'){
+        size_t hexlen = strlen(value);
+        if (hexlen < 2 || hexlen > MAX_PATTERN_LEN*2 || hexlen%2 != 0)
+            error_exit(EXIT_FAILURE, 0, "invalid argument: '%s'", value);
+        opts->pattern_len = hexlen / 2; //de digitos a bytes
+        for (size_t i = 0; i < opts->pattern_len; i++) {
+            char byte_str[3] = {value[2*i], value[2*i+1], '\0'};
+            long v = strtol(byte_str, &endptr, 16);
+            if (*endptr != '\0')
+                error_exit(EXIT_FAILURE, 0,"invalid argument: '%s'", value);
+            opts->pattern[i] = (uint8_t)v;
+        }
+        opts->pattern_use = 1;
     }
 }
