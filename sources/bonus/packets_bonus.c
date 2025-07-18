@@ -39,13 +39,15 @@ int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t
 	now = ft_time_now_us();
 	memcpy(packet.payload, &now, sizeof(now));
 
+    size_t payload_sz = opts->payload_size_use ? opts->payload_size : PAYLOAD_SIZE;
+
 	// Rellenar resto del payload
     if (opts->pattern_use){
-        for (size_t i = 0; i < PAYLOAD_SIZE; i++)
+        for (size_t i = 0; i < payload_sz; i++)
             packet.payload[i] = opts->pattern[i % opts->pattern_len];
         //print_pattern(opts);
     }else {
-	    for (size_t i = sizeof(now); i < PAYLOAD_SIZE; i++)
+	    for (size_t i = sizeof(now); i < payload_sz; i++)
 		    packet.payload[i] = 0x42; // patrón tipico
     }
 
@@ -97,7 +99,7 @@ int receive_packet(int sockfd, uint16_t sent_seq, const t_ping_options *opts, t_
     uint16_t received_checksum = icmp->checksum;
     icmp->checksum = 0;
     uint16_t icmp_len = len - (ip->ihl * 4);
-    uint16_t calculated_checksum = htons(calc_checksum(icmp, icmp_len));
+    uint16_t calculated_checksum = htons(calc_checksum(icmp, icmp_len ));
     if (received_checksum != calculated_checksum) {
         print_infof(opts->verbose, stderr, "Invalid ICMP checksum: expected 0x%04x, got 0x%04x\n", calculated_checksum, received_checksum);
         return (0);
@@ -126,7 +128,8 @@ int receive_packet(int sockfd, uint16_t sent_seq, const t_ping_options *opts, t_
     double rtt = (now - sent) / 1000.0;
 
     // Imprimir línea
-    printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n", icmp_len, ip_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
+    size_t sent_bytes = opts->payload_size_use ? ICMP_HEADER_LEN + opts->payload_size : ICMP_HEADER_LEN + PAYLOAD_SIZE;
+    printf("%zu bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n", sent_bytes, ip_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
 
     // Actualizar estadísticas
     stats->received++;

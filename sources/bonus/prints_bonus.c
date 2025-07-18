@@ -5,6 +5,7 @@
 #include <math.h>
 #include <sys/time.h>
 #include <time.h>
+#include <inttypes.h>
 #include "ft_ping_bonus.h"
 
 /**
@@ -127,4 +128,32 @@ void    print_summary(t_stats *stats){
         printf(" %02x", opts->pattern[i]);
     }
     printf("\n");    
+}
+/**
+ * @brief Función debug para imprimir las ping options
+ * 
+ * @param opts estructura de ping options
+ */
+void print_opts(const t_ping_options *opts) {
+    printf("=== Parsed options ===\n");
+    printf("  verbose       = %d\n", opts->verbose);
+    printf("  count         = %d\n", opts->count);
+    printf("  interval      = %.6f\n", opts->interval);
+    printf("  target        = %s\n", opts->target ? opts->target : "(null)");
+
+    printf("  use_pattern   = %d\n", opts->pattern_use);
+    if (opts->pattern_use) {
+        printf("  pattern_len   = %zu\n", opts->pattern_len);
+        printf("  pattern bytes =");
+        for (size_t i = 0; i < opts->pattern_len; i++) {
+            printf(" %02" PRIx8, opts->pattern[i]);
+        }
+        printf("\n");
+    }
+
+    printf("  use_size      = %d\n", opts->payload_size_use);
+    if (opts->payload_size_use)
+        printf("  packetsize    = %zu\n", opts->payload_size);
+
+    printf("======================\n");
 }

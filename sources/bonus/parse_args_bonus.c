@@ -29,6 +29,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
 
     int i = 1;
     int hostcont = 0;
+    char flag;
     char *val = NULL;
 
     while (argv[i]) {
@@ -59,6 +60,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                         case 'p':
                         case 'i':
                         case 'c':
+                            flag = argv[i][j];
                             // Caso "-c123" (sin espacio)
                             if (argv[i][j+1] != '\0') {
                                 val = &argv[i][j+1];
@@ -68,7 +70,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
                                     error_exit(EXIT_FAILURE, 0, "Option -%c requires an argument", argv[i][j]);
                                 val = argv[++i];
                             }
-                            validate_flag_arg(val, argv[i][j], opts);
+                            validate_flag_arg(val, flag, opts);
                             // Salimos del inner-loop para no reexaminar los dígitos de "123"
                             j = strlen(argv[i]) - 1;
                             break;
@@ -86,6 +88,7 @@ void parse_args(int argc, char *argv[], t_ping_options *opts){
         i++;
     }
 
+    print_opts(opts);
     if (hostcont == 0) {
         error_exit(EXIT_FAILURE, 0, "Missing host operand");
     }
