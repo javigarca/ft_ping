@@ -45,42 +45,47 @@ The executable will be located at /bin .
 
 Supported Flags
 
-  --usage              display usage and exit
+  **. --usage**              *display usage and exit*
 
-  -?, --help           display this help and exit
+  **. -?, --help**           *display this help and exit*
 
-  -v, --verbose        verbose output (print errors and control messages)
+  **. -v, --verbose**        *verbose output (print errors and control messages)*
 
-  -c <count>           stop after <count> replies
+  **. -c <count>**           *stop after <count> replies*
 
-  -i <interval>        wait <interval> seconds between packets (float)
+  **. -i <interval>**        *wait <interval> seconds between packets (float)*
 
-  -p <pattern>         pad packet with up to 16 bytes specified as a hex string
+  **. -p <pattern>**         *pad packet with up to 16 bytes specified as a hex string*
 
-  -s <packetsize>      number of data bytes to send (default 56)
+  **. -s <packetsize>**     *number of data bytes to send (default 56)*
 
-  -t <ttl>             set the IP time-to-live (1–255)
+  **. -t <ttl>**            *set the IP time-to-live (1–255)*
 
-  -r, --route          bypass the routing table (send only to directly connected hosts)
+  **. -r, --route**          *bypass the routing table (send only to directly connected hosts)*
 
-  -d                   debug option for flag activation information and packet pattern info
+  **. -d**                  *debug option for flag activation information and packet pattern info*
 
 
 *Example*
 
 *Basic ping*
+
 ./bin/ft_ping google.com
 
 *Verbose, limit to 3 pings, 0.5 s apart*
+
 ./bin/ft_ping_bonus -v -c3 -i0.5 google.com
 
 *Send a custom 4-byte pad pattern “4dab”*
+
 ./bin/ft_ping_bonus -p4dab -c3 google.com
 
 *Send zero-byte payload (8 bytes ICMP header only)*
+
 ./bin/ft_ping_bonus -s0 google.com
 
 *Bypass routing table (only on local LAN)*
+
 ./bin/ft_ping_bonus -r 192.168.0.1
 
 
