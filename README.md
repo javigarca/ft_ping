@@ -66,7 +66,7 @@ Supported Flags
   **. -d**                  *debug option for flag activation information and packet pattern info*
 
 
-*Example*
+#*Example*
 
 *Basic ping*
 
