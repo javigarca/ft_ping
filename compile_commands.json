@@ -1,0 +1,114 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers/bonus",
+      "-c",
+      "-o",
+      "obj/ft_ping_bonus.o",
+      "sources/bonus/ft_ping_bonus.c"
+    ],
+    "directory": "/home/javi/42/ft_ping",
+    "file": "/home/javi/42/ft_ping/sources/bonus/ft_ping_bonus.c",
+    "output": "/home/javi/42/ft_ping/obj/ft_ping_bonus.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers/bonus",
+      "-c",
+      "-o",
+      "obj/packets_bonus.o",
+      "sources/bonus/packets_bonus.c"
+    ],
+    "directory": "/home/javi/42/ft_ping",
+    "file": "/home/javi/42/ft_ping/sources/bonus/packets_bonus.c",
+    "output": "/home/javi/42/ft_ping/obj/packets_bonus.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers/bonus",
+      "-c",
+      "-o",
+      "obj/parse_args_bonus.o",
+      "sources/bonus/parse_args_bonus.c"
+    ],
+    "directory": "/home/javi/42/ft_ping",
+    "file": "/home/javi/42/ft_ping/sources/bonus/parse_args_bonus.c",
+    "output": "/home/javi/42/ft_ping/obj/parse_args_bonus.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers/bonus",
+      "-c",
+      "-o",
+      "obj/prints_bonus.o",
+      "sources/bonus/prints_bonus.c"
+    ],
+    "directory": "/home/javi/42/ft_ping",
+    "file": "/home/javi/42/ft_ping/sources/bonus/prints_bonus.c",
+    "output": "/home/javi/42/ft_ping/obj/prints_bonus.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers",
+      "-c",
+      "-o",
+      "obj/ft_ping.o",
+      "sources/ft_ping.c"
+    ],
+    "directory": "/home/javi/42/ft_ping",
+    "file": "/home/javi/42/ft_ping/sources/ft_ping.c",
+    "output": "/home/javi/42/ft_ping/obj/ft_ping.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers",
+      "-c",
+      "-o",
+      "obj/parse_args.o",
+      "sources/parse_args.c"
+    ],
+    "directory": "/home/javi/42/ft_ping",
+    "file": "/home/javi/42/ft_ping/sources/parse_args.c",
+    "output": "/home/javi/42/ft_ping/obj/parse_args.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I./headers",
+      "-c",
+      "-o",
+      "obj/prints.o",
+      "sources/prints.c"
+    ],
+    "directory": "/home/javi/42/ft_ping",
+    "file": "/home/javi/42/ft_ping/sources/prints.c",
+    "output": "/home/javi/42/ft_ping/obj/prints.o"
+  }
+]
