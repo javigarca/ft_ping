@@ -143,6 +143,9 @@ void print_opts(const t_ping_options *opts) {
     printf("  target        = %s\n", opts->target ? opts->target : "(null)");
     printf("  route         = %d\n", opts->route);
     printf("  use_pattern   = %d\n", opts->pattern_use);
+    printf("  ttl           = %d\n", opts->ttl_use);
+    if (opts->ttl_use)
+        printf("  ttl value     = %d\n", opts->ttl);
     if (opts->pattern_use) {
         printf("  pattern_len   = %zu\n", opts->pattern_len);
         printf("  pattern bytes =");
