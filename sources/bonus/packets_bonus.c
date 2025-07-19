@@ -24,51 +24,56 @@
  * @return int valor devuelto, 0 todo bien, -1 fallo de envío del paquete(sistema)
  */
 int send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t seq){
-    t_packet    packet;
-	uint64_t    now;
+    size_t payload_sz = opts->payload_size_use ? opts->payload_size : PAYLOAD_SIZE;
+    size_t packet_length = sizeof(t_packet) + payload_sz;
+    uint64_t    now;
 	ssize_t     sent_bytes;
 
+    t_packet    *packet = malloc(packet_length);
+	if (!packet) {
+         print_infof(opts->verbose, stderr, "malloc failed: %s", strerror(errno));
+         return (-1);
+    }
+    
 	//  Rellenar cabecera
-	memset(&packet, 0, sizeof(packet));
-	packet.header.type = ICMP_ECHO;
-	packet.header.code = ICMP_CODE_DEFAULT;
-	packet.header.id = htons((uint16_t)getpid());
-	packet.header.sequence = htons(seq);
+	memset(packet, 0, packet_length);
+	packet->header.type = ICMP_ECHO;
+	packet->header.code = ICMP_CODE_DEFAULT;
+	packet->header.id = htons((uint16_t)getpid());
+	packet->header.sequence = htons(seq);
 
 	// Timestamp en payload
 	now = ft_time_now_us();
-	memcpy(packet.payload, &now, sizeof(now));
-
-    size_t payload_sz = opts->payload_size_use ? opts->payload_size : PAYLOAD_SIZE;
+	memcpy(packet->payload, &now, sizeof(now));
 
 	// Rellenar resto del payload
     if (opts->pattern_use){
         for (size_t i = sizeof(now); i < payload_sz; i++)
-            packet.payload[i] = opts->pattern[i % opts->pattern_len];
+            packet->payload[i] = opts->pattern[i % opts->pattern_len];
         if (opts->debug)
             print_pattern(opts);
     }else {
 	    for (size_t i = sizeof(now); i < payload_sz; i++)
-		    packet.payload[i] = 0x42; // patrón tipico
+		    packet->payload[i] = 0x42; // patrón tipico
     }
 
 	//  Calcular checksum
-	packet.header.checksum = 0;
-	packet.header.checksum = htons(calc_checksum(&packet, sizeof(packet)));
+	packet->header.checksum = 0;
+	packet->header.checksum = htons(calc_checksum(packet, packet_length));
 
 	//  Enviar
-	sent_bytes = sendto(sockfd, &packet, sizeof(packet), 0, (struct sockaddr *)&stats->target.addr, sizeof(stats->target.addr));
+	sent_bytes = sendto(sockfd, packet, packet_length, 0, (struct sockaddr *)&stats->target.addr, sizeof(stats->target.addr));
 
 	if (sent_bytes < 0) {
 		print_infof(opts->verbose, stderr, "sendto failed: %s", strerror(errno));
 		return -1;
 	}
 
-	// Debug. quitar mas tarde
-	//print_infof(opts->verbose, stdout, "Sent ICMP echo seq=%d (%ld bytes)", seq, sent_bytes);
+	if (opts->debug)
+        print_infof(1, stdout, "Sent ICMP echo seq=%d (%ld bytes)", seq, sent_bytes);
     
     stats->transmitted++;
-
+    free(packet);
 	return (0);
 }
 
