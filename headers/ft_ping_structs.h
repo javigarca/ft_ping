@@ -86,7 +86,7 @@ typedef struct s_icmphdr {
  */
 typedef struct s_packet {
 	t_icmphdr	header;              // Cabecera ICMP
-	char 		payload[PAYLOAD_SIZE];   // Payload arbitrario (p.ej., timestamp o relleno)
+	uint8_t 		payload[PAYLOAD_SIZE];   // Payload arbitrario (p.ej., timestamp o relleno)
 } t_packet;
 
 #endif
