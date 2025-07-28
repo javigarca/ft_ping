@@ -22,18 +22,25 @@
  * @return int 
  */
 
-static t_stats *g_stats_ref = NULL;
+volatile sig_atomic_t g_interrupted = 0;
 
 int main (int argc, char **argv)
 {
-    t_ping_options opts = {0};
-    t_stats stats = {0};
-    g_stats_ref = &stats;
+    t_ping_options      opts = {0};
+    t_stats             stats = {0};
+    struct sigaction    sa = {0};
+    int                 socket_fd;
+
+    sa.sa_handler = sigint_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGINT, &sa, NULL)) {
+        error_exit(EXIT_FAILURE, errno, "sigaction error.");
+    }
 
     parse_args(argc, argv, &opts);   
-    signal(SIGINT, handle_sigint);
 
-    int socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+    socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
     if (socket_fd < 0){
         if (errno == EPERM || errno == EACCES || errno == EPROTONOSUPPORT)
 		    error_exit(EXIT_FAILURE, 0, "ft_ping: Lacking privilege for icmp socket.\n");
@@ -55,7 +62,7 @@ int main (int argc, char **argv)
     int seq = 1;
     gettimeofday(&stats.start_ping, NULL);
    
-    while(1){
+    while(1 && !g_interrupted){
         send_packet(socket_fd, &opts, &stats, seq);
         //timestamp de comienzo de bucle
         struct timeval start, now;
@@ -94,6 +101,8 @@ int main (int argc, char **argv)
         seq++;
         sleep(1);
     }
+    print_summary(&stats);
+    close(socket_fd);
     return (EXIT_SUCCESS);
 }
 
@@ -102,9 +111,7 @@ int main (int argc, char **argv)
  * 
  * @param signum el valor de la señal
  */
-void    handle_sigint(int signum){
+void    sigint_handler(int signum){
     (void)signum;
-    if (g_stats_ref)
-		print_summary(g_stats_ref);
-    exit(EXIT_SUCCESS);
+    g_interrupted = 1;
 }

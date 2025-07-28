@@ -22,7 +22,7 @@
  void       validate_flag_arg(char *value, char flag, t_ping_options *opts);
 
  //**** main.c ****//
- void       handle_sigint(int signum);
+ void       sigint_handler(int signum);
 
  //**** packets.c *****//
  int        send_packet(int sockfd, const t_ping_options *opts, t_stats *stats, uint16_t seq);
