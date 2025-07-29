@@ -48,7 +48,7 @@ int main (int argc, char **argv)
     }
     //Activar IP_RECVTTL en el socket:
     int opt = 1;
-    setsockopt(socket_fd, IPPROTO_IP, IP_RECVTTL, &opt, sizeof(opt));
+    setsockopt(socket_fd, IPPROTO_IP, IP_TTL, &opt, sizeof(opt));
     
     if (resolve_target(&opts, &stats.target))
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");

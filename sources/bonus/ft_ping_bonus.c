@@ -48,7 +48,7 @@ int main (int argc, char **argv)
     }
     //Activar IP_RECVTTL en el socket:
     int opt = opts.ttl_use ? opts.ttl : 1;
-    setsockopt(socket_fd, IPPROTO_IP, IP_RECVTTL, &opt, sizeof(opt));
+    setsockopt(socket_fd, IPPROTO_IP, IP_TTL, &opt, sizeof(opt));
     if (opts.route) {
         int on = 1;
         if (setsockopt(socket_fd, SOL_SOCKET, SO_DONTROUTE, &on, sizeof(on)) < 0)
