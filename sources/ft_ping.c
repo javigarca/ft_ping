@@ -50,12 +50,14 @@ int main (int argc, char **argv)
     int opt = 1;
     setsockopt(socket_fd, IPPROTO_IP, IP_TTL, &opt, sizeof(opt));
     
+    get_socket_info(socket_fd, &stats);
+    print_infof(opts.verbose, stderr, "ft_ping: sock4.fd: %d (socktype: %s), sock6.fd: -1 (socktype: 0), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);
     if (resolve_target(&opts, &stats.target))
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");
     get_socket_info(socket_fd, &stats);
   
     ////impresión cabeceras
-    print_infof(opts.verbose, stderr, "ft_ping: sock4.fd: %d (socktype: %s), sock6.fd: -1 (socktype: 0), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);
+   
     print_infof(opts.verbose,stdout, "ai->ai_family: %s, ai->ai-canonname: '%s'", stats.socket_i.family_str, stats.target.hostname);
     print_infof(1, stdout, "PING %s (%s) %d(%d) bytes of data.", stats.target.hostname, stats.target.ip_str, PAYLOAD_SIZE, WIRE_BYTES);
 
