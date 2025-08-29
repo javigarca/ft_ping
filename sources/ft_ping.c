@@ -48,7 +48,8 @@ int main (int argc, char **argv)
     }
     //Activar IP_RECVTTL en el socket:
     int opt = 1;
-    setsockopt(socket_fd, IPPROTO_IP, IP_TTL, &opt, sizeof(opt));
+    // setsockopt(socket_fd, IPPROTO_IP, IP_TTL, &opt, sizeof(opt));
+    setsockopt(socket_fd, IPPROTO_IP, IP_RECVTTL, &opt, sizeof(opt));
     
     get_socket_info(socket_fd, &stats);
     print_infof(opts.verbose, stderr, "ft_ping: sock4.fd: %d (socktype: %s), sock6.fd: -1 (socktype: 0), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str);

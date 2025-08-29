@@ -47,8 +47,14 @@ int main (int argc, char **argv)
         error_exit(EXIT_FAILURE, errno, "socket" );
     }
     //Activar IP_RECVTTL en el socket:
-    int opt = opts.ttl_use ? opts.ttl : 1;
-    setsockopt(socket_fd, IPPROTO_IP, IP_TTL, &opt, sizeof(opt));
+    int opt_recv = 1;
+    int opt_ttl = opts.ttl_use ? opts.ttl : 64;
+    if (setsockopt(socket_fd, IPPROTO_IP, IP_RECVTTL, &opt_recv, sizeof(opt_recv)) < 0) {
+        error_exit(EXIT_FAILURE, errno, "setsockopt IP_RECVTTL");
+    }
+    if (setsockopt(socket_fd, IPPROTO_IP, IP_TTL, &opt_ttl, sizeof(opt_ttl)) < 0) {
+        error_exit(EXIT_FAILURE, errno, "setsockopt IP_RECVTTL");
+    }
     if (opts.route) {
         int on = 1;
         if (setsockopt(socket_fd, SOL_SOCKET, SO_DONTROUTE, &on, sizeof(on)) < 0)
@@ -56,7 +62,6 @@ int main (int argc, char **argv)
     }
 
     get_socket_info(socket_fd, &stats);
-    print_infof(opts.verbose, stderr, "ft_ping: sock4.fd: %d (socktype: %s), sock6.fd: -1 (not used), hints.ai_family: %s.\n", socket_fd, stats.socket_i.socktype_str, stats.socket_i.family_str); 
     if (resolve_target(&opts, &stats.target))
         error_exit(EXIT_FAILURE, 0, "Error resolving host.");
   
