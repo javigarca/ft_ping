@@ -22,7 +22,7 @@ void    print_help(){
     printf("  -p <pattern>       specify up to 16 pad bytes to fill out the packet you send\n");
     printf("  -s <packetsize>    specifies the number of data bytes to be sent (default 56)\n");
     printf("  -t <ttl>           set the TTL (time to live)\n");
-    printf("  -r, --route        Bypass routing tables");
+    printf("  -r, --route        Bypass routing tables\n");
     printf("  -?, --help         display this help and exit\n");
 }
 
